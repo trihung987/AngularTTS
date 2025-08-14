@@ -1,0 +1,130 @@
+<div class="login-page">
+  <div class="bg-shapes">
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+  </div>
+
+  <div class="login-container">
+    <div class="logo-section">
+      <div class="logo">✦</div>
+      <h1 class="welcome-text">Welcome Back</h1>
+      <p class="subtitle">Sign in to your account</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <div
+          class="input-wrapper"
+          [class]="{ error: hasFieldError('username') }"
+        >
+          <input
+            type="text"
+            id="username"
+            formControlName="username"
+            placeholder="Enter your username"
+            class="form-input"
+            [class.loading]="isLoading()"
+          />
+          <div *ngIf="hasFieldError('username')" class="error-message">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            {{ getFieldError("username") }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div
+          class="input-wrapper"
+          [class]="{ error: hasFieldError('password') }"
+        >
+          <input
+            type="password"
+            id="password"
+            formControlName="password"
+            placeholder="Enter your password"
+            class="form-input"
+            [disabled]="isLoading()"
+            [class.loading]="isLoading()"
+          />
+
+          <div *ngIf="hasFieldError('password')" class="error-message">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            {{ getFieldError("password") }}
+          </div>
+        </div>
+      </div>
+
+      <div class="forgot-password">
+        <a href="#" onclick="showForgotPassword()">Quên mật khẩu?</a>
+      </div>
+
+      <div class="terms-section">
+        <div class="terms-checkbox">
+          <input
+            type="checkbox"
+            id="terms"
+            formControlName="terms"
+            class="form-checkbox"
+            [disabled]="isLoading()"
+            [class.loading]="isLoading()"
+          />
+          <label for="terms" class="terms-text">
+            Tôi đồng ý với
+            <a href="#" onclick="showTerms()">Các điều khoản dịch vụ</a> và
+            <a href="#" onclick="showPrivacy()">Chính sách bảo mật</a>
+          </label>
+        </div>
+        <div *ngIf="hasFieldError('terms')" class="error-message">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          {{ getFieldError("terms") }}
+        </div>
+      </div>
+      <div class="error-response" id="errorResponse">
+        {{ loginError }}
+      </div>
+
+      <button
+        type="submit"
+        class="login-button"
+        id="loginBtn"
+        [disabled]="isLoading()"
+        [class.loading]="isLoading()"
+      >
+        <div class="btn-content">
+          <div *ngIf="isLoading()" class="loading-spinner"></div>
+          <span>{{ isLoading() ? "Đang đăng nhập..." : "Đăng nhập" }}</span>
+        </div>
+      </button>
+    </form>
+  </div>
+</div>

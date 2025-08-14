@@ -1,0 +1,219 @@
+<!-- register.component.html -->
+<div class="register-container">
+  <!-- Toast Notifications -->
+
+  <!-- Background Elements -->
+  <div class="background-elements">
+    <div class="bg-circle bg-circle-1"></div>
+    <div class="bg-circle bg-circle-2"></div>
+    <div class="bg-circle bg-circle-3"></div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="register-card">
+    <div class="card-header">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="m22 21-3-3m-4-4 3-3m-3 3-3-3"></path>
+          </svg>
+        </div>
+        <h1>Create Account</h1>
+      </div>
+      <p class="subtitle">Join our community today</p>
+    </div>
+
+    <form [formGroup]="signUpForm" (ngSubmit)="onSubmit()" class="register-form">
+      <!-- Full Name Field -->
+      <div class="form-group">
+        <label for="fullname" class="form-label">Tên đầy đủ</label>
+        <div class="input-wrapper" [class]="{ 'input-error': hasFieldError('fullname') }">
+          <div class="input-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          <input
+            id="fullname"
+            type="text"
+            formControlName="fullname"
+            placeholder="Nhập họ và tên đầy đủ của bạn"
+            class="form-input"
+          />
+        </div>
+        <div *ngIf="hasFieldError('fullname')" class="error-message">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          {{ getFieldError('fullname') }}
+        </div>
+      </div>
+
+      <!-- Username Field -->
+      <div class="form-group">
+        <label for="username" class="form-label">Tên đăng nhập</label>
+        <div class="input-wrapper" [class]="{ 'input-error': hasFieldError('username') }">
+          <div class="input-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          <input
+            id="username"
+            type="text"
+            formControlName="username"
+            placeholder="Nhập tên đăng nhập"
+            class="form-input"
+          />
+        </div>
+        <div *ngIf="hasFieldError('username')" class="error-message">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          {{ getFieldError('username') }}
+        </div>
+      </div>
+
+      <!-- Email Field -->
+      <div class="form-group">
+        <label for="email" class="form-label">Địa chỉ Email</label>
+        <div class="input-wrapper" [class]="{ 'input-error': hasFieldError('email') }">
+          <div class="input-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+          </div>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="Nhập địa chỉ email"
+            class="form-input"
+          />
+        </div>
+        <div *ngIf="hasFieldError('email')" class="error-message">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          {{ getFieldError('email') }}
+        </div>
+      </div>
+
+      <!-- Password Field -->
+      <div class="form-group">
+        <label for="password" class="form-label">Mật khẩu</label>
+        <div class="input-wrapper" [class]="{ 'input-error': hasFieldError('password') }">
+          <div class="input-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <circle cx="12" cy="16" r="1"></circle>
+              <path d="m7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </div>
+          <input
+            id="password"
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="Tạo mật khẩu"
+            class="form-input"
+          />
+          <button
+            type="button"
+            aria-label="eye icon"
+            class="password-toggle"
+            (click)="togglePasswordVisibility('password')"
+          >
+            <svg *ngIf="!showPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <svg *ngIf="showPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
+          </button>
+        </div>
+        <div *ngIf="hasFieldError('password')" class="error-message">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          {{ getFieldError('password') }}
+        </div>
+      </div>
+
+      <!-- Confirm Password Field -->
+      <div class="form-group">
+        <label for="retypedPassword" class="form-label">Nhập lại mật khẩu</label>
+        <div class="input-wrapper" [class]="{ 'input-error': hasFieldError('retypedPassword') }">
+          <div class="input-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <circle cx="12" cy="16" r="1"></circle>
+              <path d="m7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </div>
+          <input
+            id="retypedPassword"
+            [type]="showRetypedPassword ? 'text' : 'password'"
+            formControlName="retypedPassword"
+            placeholder="Xác nhận mật khẩu"
+            class="form-input"
+          />
+          <button
+            type="button"
+            class="password-toggle"
+            aria-label="eye icon"
+            (click)="togglePasswordVisibility('retypedPassword')"
+          >
+            <svg *ngIf="!showRetypedPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <svg *ngIf="showRetypedPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
+          </button>
+        </div>
+        <div *ngIf="hasFieldError('retypedPassword')" class="error-message">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          {{ getFieldError('retypedPassword') }}
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button
+        type="submit"
+        class="submit-btn"
+        [disabled]="isLoading()"
+        [class.loading]="isLoading()"
+      >
+        <div class="btn-content">
+          <div *ngIf="isLoading()" class="loading-spinner"></div>
+          <span>{{ isLoading() ? 'Đang đăng ký...' : 'Đăng ký' }}</span>
+        </div>
+      </button>
+
+      <!-- Footer -->
+      <div class="form-footer">
+        <p>Đã có tài khoản? <a href="/login" class="login-link">Đăng nhập ngay</a></p>
+      </div>
+    </form>
+  </div>

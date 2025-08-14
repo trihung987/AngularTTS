@@ -1,0 +1,46 @@
+<!-- Header/Navbar -->
+<header class="header">
+  <nav class="nav">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <div class="logo">
+          <svg class="logo-icon" fill="currentColor" viewBox="0 0 24 24">
+            <path
+              d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"
+            />
+          </svg>
+        </div>
+        <h1 class="brand-name">EventHub</h1>
+      </div>
+
+      <div class="nav-links" [class.menu-open]="isMenuOpen" >
+        <a href="#events" class="nav-link">Sự kiện</a>
+        <a href="#create" class="nav-link">Tạo sự kiện</a>
+        <a href="#tickets" class="nav-link">Vé của tôi</a>
+        <a href="#support" class="nav-link">Hỗ trợ</a>
+      </div>
+
+      <div class="nav-actions">
+        <button class="btn-login">Đăng nhập</button>
+        <button class="btn-signup">Đăng ký</button>
+      </div>
+
+      <button class="mobile-menu-btn" aria-label="Menu" (click)="toggleMenu()">
+        <svg
+          class="mobile-menu-icon"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"
+          />
+        </svg>
+      </button>
+    </div>
+  </nav>
+</header>
+

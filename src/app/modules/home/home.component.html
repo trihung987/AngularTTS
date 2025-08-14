@@ -1,0 +1,364 @@
+
+<!-- Hero Section -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-content">
+      <h1 class="hero-title">
+        Khám phá sự kiện <span class="highlight">tuyệt vời</span>
+      </h1>
+      <p class="hero-description">
+        Nền tảng đặt vé sự kiện hàng đầu Việt Nam. Tìm kiếm, đặt vé và tham gia
+        những sự kiện đỉnh cao với trải nghiệm seamless từ A-Z.
+      </p>
+
+      <!-- Search Bar -->
+      <div class="search-container">
+        <div class="search-box">
+          <div class="search-input-container">
+            <svg
+              class="search-icon"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            <input
+              type="text"
+              placeholder="Tìm kiếm sự kiện, địa điểm, chủ đề..."
+              class="search-input"
+            />
+          </div>
+          <button class="search-btn">Tìm kiếm</button>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number blue">1000+</div>
+          <div class="stat-label">Sự kiện hoạt động</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number purple">50K+</div>
+          <div class="stat-label">Người dùng tin tưởng</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number pink">99.9%</div>
+          <div class="stat-label">Độ tin cậy hệ thống</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Events -->
+<section class="featured-events">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Sự kiện nổi bật</h2>
+      <p class="section-description">Những sự kiện hot nhất không thể bỏ lỡ</p>
+    </div>
+
+    <div class="events-grid">
+      @for (event of featuredEvents; track event.id) {
+      <div class="event-card">
+        <div class="event-image">
+          <img [ngSrc]="event.image" alt="AV" width="50" height="50"/>
+          <div class="event-category">{{ event.category }}</div>
+          <div class="event-rating">
+            <svg class="star-icon" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+              />
+            </svg>
+            <span>{{ event.rating }}</span>
+          </div>
+        </div>
+        <div class="event-details">
+          <h3 class="event-title">{{ event.title }}</h3>
+          <div class="event-info">
+            <div class="info-item">
+              <svg
+                class="info-icon"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+              <span>{{ event.date }}</span>
+            </div>
+            <div class="info-item">
+              <svg
+                class="info-icon"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+              <span>{{ event.location }}</span>
+            </div>
+            <div class="info-item">
+              <svg
+                class="info-icon"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                />
+              </svg>
+              <span>{{ event.attendees }} người tham gia</span>
+            </div>
+          </div>
+          <div class="event-footer">
+            <div class="event-price">{{ event.price }}₫</div>
+            <button class="btn-book">Đặt vé</button>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+
+    <div class="view-all-container">
+      <button class="btn-view-all">Xem tất cả sự kiện</button>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="features">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Tại sao chọn EventHub?</h2>
+      <p class="section-description">
+        Trải nghiệm đặt vé hoàn hảo với công nghệ tiên tiến
+      </p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 10V3L4 14h7v7l9-11h-7z"
+            />
+          </svg>
+        </div>
+        <h3 class="feature-title">Đặt vé nhanh chóng</h3>
+        <p class="feature-description">
+          Chỉ với vài click, bạn đã có vé tham gia sự kiện yêu thích
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+            />
+          </svg>
+        </div>
+        <h3 class="feature-title">Bảo mật tuyệt đối</h3>
+        <p class="feature-description">
+          Thông tin cá nhân và thanh toán được bảo vệ với công nghệ mã hóa tiên
+          tiến
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"
+            />
+          </svg>
+        </div>
+        <h3 class="feature-title">Hỗ trợ 24/7</h3>
+        <p class="feature-description">
+          Đội ngũ chăm sóc khách hàng luôn sẵn sàng hỗ trợ bạn mọi lúc, mọi nơi
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
+            />
+          </svg>
+        </div>
+        <h3 class="feature-title">Vé điện tử</h3>
+        <p class="feature-description">
+          Quản lý vé dễ dàng với mã QR, không lo thất lạc hay quên vé
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+            />
+          </svg>
+        </div>
+        <h3 class="feature-title">Giá cả minh bạch</h3>
+        <p class="feature-description">
+          Không có phí ẩn, giá vé rõ ràng và nhiều ưu đãi hấp dẫn
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9"
+            />
+          </svg>
+        </div>
+        <h3 class="feature-title">Đa dạng sự kiện</h3>
+        <p class="feature-description">
+          Từ âm nhạc, thể thao đến hội thảo, luôn có sự kiện phù hợp với bạn
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Categories -->
+<section class="categories">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Khám phá theo danh mục</h2>
+      <p class="section-description">
+        Tìm sự kiện phù hợp với sở thích của bạn
+      </p>
+    </div>
+
+    <div class="categories-grid">
+      <div class="category-card music">
+        <div class="category-icon">🎵</div>
+        <h3 class="category-name">Âm nhạc</h3>
+      </div>
+      <div class="category-card sports">
+        <div class="category-icon">⚽</div>
+        <h3 class="category-name">Thể thao</h3>
+      </div>
+      <div class="category-card tech">
+        <div class="category-icon">💻</div>
+        <h3 class="category-name">Công nghệ</h3>
+      </div>
+      <div class="category-card business">
+        <div class="category-icon">💼</div>
+        <h3 class="category-name">Kinh doanh</h3>
+      </div>
+      <div class="category-card art">
+        <div class="category-icon">🎨</div>
+        <h3 class="category-name">Nghệ thuật</h3>
+      </div>
+      <div class="category-card food">
+        <div class="category-icon">🍜</div>
+        <h3 class="category-name">Ẩm thực</h3>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Simple interactivity
+  document.addEventListener("DOMContentLoaded", function () {
+    // Search functionality
+    const searchInput = document.querySelector(".search-input");
+    const searchBtn = document.querySelector(".search-btn");
+
+    searchBtn.addEventListener("click", function () {
+      const query = searchInput.value.trim();
+      if (query) {
+        alert(`Đang tìm kiếm: "${query}"`);
+      }
+    });
+
+    searchInput.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        searchBtn.click();
+      }
+    });
+
+    // Book ticket buttons
+    const bookBtns = document.querySelectorAll(".btn-book");
+    bookBtns.forEach((btn) => {
+      btn.addEventListener("click", function () {
+        alert("Chức năng đặt vé sẽ được triển khai sớm!");
+      });
+    });
+
+    // Category cards
+    const categoryCards = document.querySelectorAll(".category-card");
+    categoryCards.forEach((card) => {
+      card.addEventListener("click", function () {
+        const categoryName = card.querySelector(".category-name").textContent;
+        alert(`Đang tải sự kiện ${categoryName}...`);
+      });
+    });
+
+
+
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+      anchor.addEventListener("click", function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute("href"));
+        if (target) {
+          target.scrollIntoView({
+            behavior: "smooth",
+          });
+        }
+      });
+    });
+  });
+</script>
