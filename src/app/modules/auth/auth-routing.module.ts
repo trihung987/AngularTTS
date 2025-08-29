@@ -1,3 +1,5 @@
+// src/app/modules/auth/auth-routing.module.ts
+
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthLayoutComponent } from './components/auth-layout/auth-layout.component';
@@ -10,19 +12,25 @@ const routes: Routes = [
     component: AuthLayoutComponent,
     children: [
       {
-        path: 'login',
-        component: LoginComponent
+        path: 'login', // URL đầy đủ sẽ là /auth/login
+        component: LoginComponent,
       },
       {
-        path: 'register',
-        component: RegisterComponent
-      }
-    ]
-  }
+        path: 'register', // URL đầy đủ sẽ là /auth/register
+        component: RegisterComponent,
+      },
+      {
+        // nếu vào mỗi auth thì redirect đến login
+        path: '',
+        redirectTo: 'login',
+        pathMatch: 'full',
+      },
+    ],
+  },
 ];
 
 @NgModule({
-  imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  imports: [RouterModule.forChild(routes)], // Sử dụng forChild cho module con
+  exports: [RouterModule],
 })
-export class AuthRoutingModule { }
+export class AuthRoutingModule {}

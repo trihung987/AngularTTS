@@ -1,3 +1,24 @@
+<!-- @if (isRouterReady) { <router-outlet></router-outlet>} @else {
+<div class="app-loading-indicator">
+  <p>Đang tải trang...</p>
+</div>
+} -->
 
-<router-outlet/>
-
+<ng-container *ngIf="isBrowser">
+  <!-- component chỉ render ở client -->
+  <router-outlet></router-outlet>
+</ng-container>
+<!-- @if (isRouterReady) {
+  <router-outlet></router-outlet>
+} @else {
+  <div class="app-loading-indicator">
+    <p>Đang tải trang...</p>
+  </div>
+} -->
+<!-- Thêm check router đã sẵn sàng chưa, nếu chưa thì hiện trang tạm
+ Nếu rồi thì hiện child router-outlet
+ Vì nếu không làm vậy trang child hiện ở router-outlet sẽ hiện trước rồi Guard mới check r redirect sau
+ Dẫn đến bị flicker thấy được trang login
+ Thay vào đó thì load trang tạm trước đợi router đã ready rồi mới thả router-outlet lúc này
+ router sẽ redirect đi nếu k thỏa GUARD trước khi các page con hiện ra. Giảm tình trạng bị lộ UI/UX page khi chưa được cho phép
+-->

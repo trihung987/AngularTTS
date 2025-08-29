@@ -1,7 +1,9 @@
+import { AuthService } from './../auth/services/auth.service';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { StorageWrapperService } from '../../shared/services/storage-wrapper.service';
 
 interface Event {
   id: number;
@@ -28,7 +30,12 @@ interface Feature {
   styleUrl: './home.component.css',
   encapsulation: ViewEncapsulation.Emulated //Phạm vi áp dụng của css - emulated = chỉ host component, None = toàn cục
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit{
+  constructor(private authSerice: AuthService){
+  }
+  ngOnInit(): void {
+
+  }
   searchQuery = '';
 
   featuredEvents: Event[] = [

@@ -1,0 +1,429 @@
+<div class="step-container" [@fadeInUp]>
+  <div class="step-header">
+    <h2 class="step-title">Thông tin thanh toán</h2>
+    <p class="step-description">
+      Cung cấp tài khoản ngân hàng để nhận tiền từ việc bán vé
+    </p>
+  </div>
+
+  <form class="payment-form">
+    <!-- Security Notice -->
+    <div class="security-notice" [@slideIn]>
+      <div class="notice-icon">
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          <path d="M9 12l2 2 4-4" />
+        </svg>
+      </div>
+      <div class="notice-content">
+        <h3 class="notice-title">Bảo mật thông tin</h3>
+        <p class="notice-text">
+          Thông tin tài khoản của bạn được mã hóa và bảo mật tuyệt đối. Chúng
+          tôi chỉ sử dụng để chuyển tiền từ việc bán vé.
+        </p>
+      </div>
+    </div>
+
+    <!-- Payment Info Section -->
+    <div class="form-section">
+      <div class="section-header">
+        <h3 class="section-title">Thông tin tài khoản</h3>
+        <div class="section-actions">
+          <!-- <button
+            type="button"
+            class="action-btn secondary"
+            (click)="generateTestAccountInfo()"
+            title="Điền thông tin mẫu để test"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"
+              />
+              <circle cx="12" cy="13" r="3" />
+            </svg>
+            Test
+          </button> -->
+          <button
+            type="button"
+            class="action-btn danger"
+            (click)="clearPaymentInfo()"
+            title="Xóa tất cả thông tin"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="3,6 5,6 21,6" />
+              <path
+                d="M19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"
+              />
+            </svg>
+            Xóa
+          </button>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <!-- Account Holder -->
+        <div class="form-group full-width">
+          <label class="form-label">
+            <span>Tên chủ tài khoản *</span>
+            <span class="char-count"
+              >{{ (eventData.bankInfo?.accountHolder || "").length }}/50</span
+            >
+          </label>
+          <!-- Nếu dùng input thì fai cập nhập tay lại event.value=? input vì
+           (input) đã chặn việc ô input ngoài form web nhận
+           được data mới từ trong biến, có thể dùng (ngModelChange) khỏi cập nhập tay vì
+           k chặn ngModel set ngược value ra web -->
+          <input
+            type="text"
+            [(ngModel)]="eventData.bankInfo!.accountHolder"
+            name="holder"
+            (input)="onAccountHolderInput($event)"
+            class="form-input"
+            [class.error]="validationErrors['accountHolder']"
+            placeholder="VD: NGUYEN VAN A"
+            maxlength="50"
+            autocomplete="off"
+          />
+          <div *ngIf="validationErrors['accountHolder']" class="error-message">
+            {{ validationErrors["accountHolder"] }}
+          </div>
+          <div class="field-hint">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M9,9h0a3,3,0,0,1,5.12,2.12A3,3,0,0,1,9,15" />
+              <line x1="9" y1="17" x2="9.01" y2="17" />
+            </svg>
+            Nhập tên chủ tài khoản như trên thẻ ngân hàng (chữ hoa, không dấu)
+          </div>
+        </div>
+
+        <!-- Account Number -->
+        <div class="form-group">
+          <label class="form-label">
+            <span>Số tài khoản *</span>
+            <span
+              *ngIf="isValidAccountNumber()"
+              class="validation-status valid"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M9 12l2 2 4-4" />
+                <circle cx="12" cy="12" r="10" />
+              </svg>
+              Hợp lệ
+            </span>
+          </label>
+          <input
+            type="text"
+            (input)="onAccountNumberInput($event)"
+            class="form-input account-number"
+            [class.error]="validationErrors['accountNumber']"
+            [class.valid]="isValidAccountNumber()"
+            placeholder="0000 0000 0000 0000"
+            maxlength="24"
+            autocomplete="off"
+          />
+          <div *ngIf="validationErrors['accountNumber']" class="error-message">
+            {{ validationErrors["accountNumber"] }}
+          </div>
+          <div class="field-hint">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+              <line x1="1" y1="10" x2="23" y2="10" />
+            </svg>
+            Nhập số tài khoản không có khoảng trắng (8-20 số)
+          </div>
+        </div>
+
+        <!-- Bank Name -->
+        <div class="form-group">
+          <label class="form-label">
+            <span>Tên ngân hàng *</span>
+          </label>
+          <div class="bank-select-container">
+            <!--Use ngModelChange ( This listens for changes in the input field
+             and updates your component's variable from the input field.
+             example: (ngModelChange)="eventData.bankInfo.bankName = $event")
+            for can custom when write input when use [(ngModel)]
+            If dont need customize or check something just use [(ngModel)] is enough
+            Dont use (input) when use ngModel it is conflict-->
+            <input
+              type="text"
+              [(ngModel)]="eventData.bankInfo!.bankName"
+              name="BankName"
+              (ngModelChange)="onBankNameInputChange($event)"
+              (keydown)="onBankNameKeydown($event)"
+              (focus)="onBankNameFocus()"
+              (blur)="onBankNameBlur()"
+              class="form-input bank-input"
+              [class.error]="validationErrors['bankName']"
+              placeholder="Chọn hoặc nhập tên ngân hàng"
+              autocomplete="off"
+            />
+
+            <div
+              *ngIf="showBankDropdown && filteredBanks.length > 0"
+              class="bank-dropdown"
+              [@slideIn]
+            >
+              <div class="dropdown-header">
+                <span>Ngân hàng phổ biến</span>
+                <span class="result-count"
+                  >{{ filteredBanks.length }} kết quả</span
+                >
+              </div>
+              <div class="bank-list">
+                <button
+                  *ngFor="let bank of filteredBanks; let i = index"
+                  type="button"
+                  class="bank-item"
+                  [class.highlighted]="i === selectedBankIndex"
+                  (click)="selectBank(bank)"
+                >
+                  <span class="bank-icon">{{ getBankIcon(bank) }}</span>
+                  <span class="bank-name">{{ bank }}</span>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <polyline points="9,18 15,12 9,6" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="validationErrors['bankName']" class="error-message">
+            {{ validationErrors["bankName"] }}
+          </div>
+        </div>
+
+        <!-- Bank Branch -->
+        <div class="form-group full-width">
+          <label class="form-label">
+            <span>Chi nhánh (tùy chọn)</span>
+          </label>
+          <input
+            type="text"
+            [(ngModel)]="eventData.bankInfo!.bankBranch"
+            name="BankBranch"
+            (input)="onBankBranchInput()"
+            class="form-input"
+            [class.error]="validationErrors['bankBranch']"
+            placeholder="VD: Chi nhánh Thành phố Hồ Chí Minh"
+          />
+          <div *ngIf="validationErrors['bankBranch']" class="error-message">
+            {{ validationErrors["bankBranch"] }}
+          </div>
+          <div class="field-hint">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9,22 9,12 15,12 15,22" />
+            </svg>
+            Thông tin chi nhánh giúp xác minh tài khoản chính xác hơn
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview Card -->
+    <div
+      *ngIf="
+        eventData.bankInfo?.accountHolder || eventData.bankInfo?.accountNumber
+      "
+      class="preview-section"
+      [@slideIn]
+    >
+      <h3 class="preview-title">Xem trước thông tin</h3>
+
+      <div class="bank-card" [@cardFlip]>
+        <div class="card-header">
+          <div class="card-logo">
+            <span class="bank-icon-large">{{
+              getBankIcon(eventData.bankInfo?.bankName || "")
+            }}</span>
+            <span class="bank-name-card">{{
+              eventData.bankInfo?.bankName || "Ngân hàng"
+            }}</span>
+          </div>
+          <div class="card-type">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+              <line x1="1" y1="10" x2="23" y2="10" />
+            </svg>
+          </div>
+        </div>
+
+        <div class="card-number">
+          <span class="number-display">
+            {{ formattedAccountNumber || "•••• •••• •••• ••••" }}
+          </span>
+        </div>
+
+        <div class="card-footer">
+          <div class="card-holder">
+            <span class="label">Chủ tài khoản</span>
+            <span class="value">{{
+              eventData.bankInfo?.accountHolder || "TÊN CHỦ TÀI KHOẢN"
+            }}</span>
+          </div>
+          <div class="card-branch" *ngIf="eventData.bankInfo?.bankBranch">
+            <span class="label">Chi nhánh</span>
+            <span class="value">{{
+              eventData.bankInfo?.bankBranch || ""
+            }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Section -->
+    <div class="summary-section" [@slideIn]>
+      <div class="summary-header">
+        <h3 class="summary-title">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M9 11l3 3 8-8" />
+            <path
+              d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c2.2 0 4.21.8 5.77 2.13"
+            />
+          </svg>
+          Tóm tắt thông tin
+        </h3>
+      </div>
+
+      <div class="summary-content">
+        <div class="summary-item">
+          <span class="summary-label">Chủ tài khoản:</span>
+          <span class="summary-value">
+            {{ eventData.bankInfo?.accountHolder || "Chưa nhập" }}
+          </span>
+        </div>
+
+        <div class="summary-item">
+          <span class="summary-label">Số tài khoản:</span>
+          <span class="summary-value account-number">
+            {{ formattedAccountNumber || "Chưa nhập" }}
+          </span>
+        </div>
+
+        <div class="summary-item">
+          <span class="summary-label">Ngân hàng:</span>
+          <span class="summary-value">
+            <span class="bank-icon-small">{{
+              getBankIcon(eventData.bankInfo?.bankName || "")
+            }}</span>
+            {{ eventData.bankInfo?.bankName || "Chưa chọn" }}
+          </span>
+        </div>
+
+        <div class="summary-item" *ngIf="eventData.bankInfo?.bankBranch">
+          <span class="summary-label">Chi nhánh:</span>
+          <span class="summary-value">{{
+            eventData.bankInfo?.bankBranch || ""
+          }}</span>
+        </div>
+      </div>
+
+      <div class="summary-status">
+        <div class="status-indicator" [class.complete]="isStepValid">
+          <svg
+            *ngIf="isStepValid"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M9 12l2 2 4-4" />
+            <circle cx="12" cy="12" r="10" />
+          </svg>
+          <svg
+            *ngIf="!isStepValid"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <span>{{
+            isStepValid
+              ? "Thông tin đã đầy đủ"
+              : "Vui lòng hoàn thiện thông tin"
+          }}</span>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

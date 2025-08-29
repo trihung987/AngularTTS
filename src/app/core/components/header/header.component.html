@@ -1,29 +1,25 @@
-<!-- Header/Navbar -->
 <header class="header">
   <nav class="nav">
     <div class="nav-container">
-      <div class="nav-brand">
-        <div class="logo">
-          <svg class="logo-icon" fill="currentColor" viewBox="0 0 24 24">
-            <path
-              d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"
-            />
-          </svg>
+      <app-logo/>
+
+      <div class="nav-links" [class.menu-open]="isMenuOpen">
+        <a (click)="redirect('/events')" class="nav-link">Sự kiện</a>
+        <a (click)="redirect('/organizer/create-event')" class="nav-link">Tạo sự kiện</a>
+        <a (click)="redirect('/my-tickets')" class="nav-link">Vé của tôi</a>
+        <a (click)="redirect('/support')" class="nav-link">Hỗ trợ</a>
+      </div>
+
+      @if (isLogin() && !isLoading()) {
+        <app-user-menu [isLogin]="isLogin()"/>
+      } @else if (isLoading()) {
+        <div class="skeleton-wrapper">
+           <ngx-skeleton-loader count="1" appearance="circle" [theme]="{ 'width': '40px', 'height': '40px' }" />
+           <ngx-skeleton-loader count="1" appearance="line" [theme]="{ 'width': '100px', 'height': '30px' }" />
         </div>
-        <h1 class="brand-name">EventHub</h1>
-      </div>
-
-      <div class="nav-links" [class.menu-open]="isMenuOpen" >
-        <a href="#events" class="nav-link">Sự kiện</a>
-        <a href="#create" class="nav-link">Tạo sự kiện</a>
-        <a href="#tickets" class="nav-link">Vé của tôi</a>
-        <a href="#support" class="nav-link">Hỗ trợ</a>
-      </div>
-
-      <div class="nav-actions">
-        <button class="btn-login">Đăng nhập</button>
-        <button class="btn-signup">Đăng ký</button>
-      </div>
+      } @else  {
+        <app-user-menu [isLogin]="false"/>
+      }
 
       <button class="mobile-menu-btn" aria-label="Menu" (click)="toggleMenu()">
         <svg
@@ -43,4 +39,3 @@
     </div>
   </nav>
 </header>
-

@@ -1,3 +1,4 @@
+import { StorageWrapperService } from './../../../../shared/services/storage-wrapper.service';
 import { tokenDto } from './../../models/token-dto.model';
 import { AuthService } from './../../services/auth.service';
 import { LoginRequest } from './../../models/login.model';
@@ -31,7 +32,8 @@ export class LoginComponent implements OnInit {
     private fb: NonNullableFormBuilder,
     private authService: AuthService,
     private toastr: ToastrService,
-    private router: Router
+    private router: Router,
+    private storage: StorageWrapperService
   ) {}
 
   getFieldError(fieldName: string): string {
@@ -90,13 +92,22 @@ export class LoginComponent implements OnInit {
     }
 
     this.isLoading.set(true);
-    const loginData: LoginRequest = this.loginForm.value;
+    const loginData: LoginRequest = {
+      username: this.loginForm.value.username,
+      password: this.loginForm.value.password,
+      };
+
     this.authService.login(loginData).subscribe({
       next: (res) => {
         this.isLoading.set(false);
-        localStorage.setItem('accessToken', res.accessToken);
-        localStorage.setItem('refreshToken', res.refreshToken);
-        this.toastr.success('Đăng nhập thành công', 'Chào mừng bạn quay trở lại');
+        this.authService.setAccessToken(res.accessToken);
+        console.log('from login', res.accessToken);
+        this.authService.setRefreshToken(res.refreshToken);
+        this.toastr.success(
+          `Đăng nhập thành công`,
+          `Chào mừng bạn quay trở lại`
+        );
+
         this.router.navigate(["/"]);
       },
       error: (err) => {

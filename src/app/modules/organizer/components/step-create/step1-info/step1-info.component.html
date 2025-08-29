@@ -1,0 +1,299 @@
+<div class="step-container" @fadeInUp>
+  <header class="step-header">
+    <h2 class="step-title">Thông tin cơ bản về sự kiện</h2>
+    <p class="step-description">
+      Hãy bắt đầu với những thông tin cần thiết nhất để mọi người hiểu rõ hơn về
+      sự kiện của bạn.
+    </p>
+  </header>
+
+  <form class="event-form" #eventInfoForm="ngForm" (ngSubmit)="$event.preventDefault()">
+    <section class="form-section">
+      <h3 class="section-title">Thông tin cơ bản</h3>
+      <div class="form-group full-width">
+        <label for="eventName" class="form-label">Tên sự kiện</label>
+        <input
+          type="text"
+          id="eventName"
+          name="eventName"
+          class="form-input"
+          placeholder="Ví dụ: Lễ hội Âm nhạc Mùa Hè 2025"
+          required
+          minlength="5"
+          [(ngModel)]="eventData.eventName"
+          (ngModelChange)="onDataChange()"
+          [class.error]="validationErrors['eventName']"
+        />
+        <div *ngIf="validationErrors['eventName']" class="error-message">
+          {{ validationErrors['eventName'] }}
+        </div>
+      </div>
+
+      <div class="form-group full-width">
+        <label for="eventCategory" class="form-label">Thể loại sự kiện</label>
+        <select
+          id="eventCategory"
+          name="eventCategory"
+          class="form-select"
+          required
+          [(ngModel)]="eventData.eventCategory"
+          (ngModelChange)="onDataChange()"
+          [class.error]="validationErrors['eventCategory']"
+        >
+          <option value="" disabled>-- Chọn thể loại --</option>
+          <option *ngFor="let category of categories" [value]="category">
+            {{ category }}
+          </option>
+        </select>
+        <div *ngIf="validationErrors['eventCategory']" class="error-message">
+          {{ validationErrors['eventCategory'] }}
+        </div>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <h3 class="section-title">Hình ảnh sự kiện</h3>
+      <div class="image-uploads">
+        <div class="image-upload-group avatar-group">
+          <div class="upload-label">
+            <span class="label-text">Ảnh đại diện (1:1)</span>
+            <span class="label-hint">Tối đa 5MB</span>
+          </div>
+          <input
+            type="file"
+            #eventImageInput
+            hidden
+            accept="image/png, image/jpeg, image/webp"
+            (change)="onEventImageSelect($event)"
+          />
+          <div
+            class="image-upload-area"
+            [class.has-image]="eventImagePreview"
+            (click)="eventImageInput.click()"
+          >
+            <ng-container *ngIf="!eventImagePreview">
+              <div class="upload-placeholder">
+                <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <h4>Tải ảnh lên</h4>
+                <p>JPG, PNG, WEBP</p>
+              </div>
+            </ng-container>
+            <ng-container *ngIf="eventImagePreview">
+              <div class="image-preview" @imagePreview>
+                <img [src]="eventImagePreview" alt="Event Preview" />
+                <div class="image-overlay">
+                  <button aria-label="add-event-img" type="button" class="overlay-btn" (click)="$event.stopPropagation(); eventImageInput.click()">
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h3l2-2h6l2 2h3v16H4V4z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15a3 3 0 100-6 3 3 0 000 6z"></path></svg>
+                  </button>
+                  <button aria-label="remove-event-img" type="button" class="overlay-btn danger" (click)="$event.stopPropagation(); removeEventImage()">
+                     <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                  </button>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+          <div *ngIf="validationErrors['eventImage']" class="error-message">
+            {{ validationErrors['eventImage'] }}
+          </div>
+        </div>
+
+        <div class="image-upload-group banner-group">
+          <div class="upload-label">
+            <span class="label-text">Ảnh bìa (16:9)</span>
+            <span class="label-hint">Tối đa 5MB</span>
+          </div>
+          <input
+            type="file"
+            #bannerImageInput
+            hidden
+            accept="image/png, image/jpeg, image/webp"
+            (change)="onBannerImageSelect($event)"
+          />
+          <div
+            class="image-upload-area banner"
+            [class.has-image]="bannerImagePreview"
+            (click)="bannerImageInput.click()"
+          >
+            <ng-container *ngIf="!bannerImagePreview">
+              <div class="upload-placeholder">
+                 <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                <h4>Tải ảnh lên</h4>
+                <p>JPG, PNG, WEBP</p>
+              </div>
+            </ng-container>
+            <ng-container *ngIf="bannerImagePreview">
+              <div class="image-preview" @imagePreview>
+                <img [src]="bannerImagePreview" alt="Banner Preview" />
+                <div class="image-overlay">
+                   <button aria-label="add-banner" type="button" class="overlay-btn" (click)="$event.stopPropagation(); bannerImageInput.click()">
+                     <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h3l2-2h6l2 2h3v16H4V4z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15a3 3 0 100-6 3 3 0 000 6z"></path></svg>
+                  </button>
+                  <button aria-label="remove-banner" type="button" class="overlay-btn danger" (click)="$event.stopPropagation(); removeBannerImage()">
+                     <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                  </button>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+           <div *ngIf="validationErrors['bannerImage']" class="error-message">
+            {{ validationErrors['bannerImage'] }}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <h3 class="section-title">Thông tin ban tổ chức</h3>
+      <div class="organizer-grid">
+        <div class="image-upload-group logo-group">
+          <div class="upload-label">
+            <span class="label-text">Logo ban tổ chức (7:4) </span>
+            <span class="label-hint">Tối đa 5MB</span>
+          </div>
+          <input
+            type="file"
+            #organizerLogoInput
+            hidden
+            accept="image/png, image/jpeg, image/webp"
+            (change)="onOrganizerLogoSelect($event)"
+          />
+          <div class="image-upload-area" [class.has-image]="organizerLogoPreview" (click)="organizerLogoInput.click()">
+            <ng-container *ngIf="!organizerLogoPreview">
+              <div class="upload-placeholder">
+                <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                <h4>Tải logo lên</h4>
+                <p>JPG, PNG, WEBP</p>
+              </div>
+            </ng-container>
+            <ng-container *ngIf="organizerLogoPreview">
+              <div class="image-preview" @imagePreview>
+                <img [src]="organizerLogoPreview" alt="Organizer Logo Preview" />
+                <div class="image-overlay">
+                  <button aria-label="add-logo" type="button" class="overlay-btn" (click)="$event.stopPropagation(); organizerLogoInput.click()">
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h3l2-2h6l2 2h3v16H4V4z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15a3 3 0 100-6 3 3 0 000 6z"></path></svg>
+                  </button>
+                  <button aria-label="remove-logo" type="button" class="overlay-btn danger" (click)="$event.stopPropagation(); removeOrganizerLogo()">
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                  </button>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+          <div *ngIf="validationErrors['organizerLogo']" class="error-message">
+            {{ validationErrors['organizerLogo'] }}
+          </div>
+        </div>
+
+        <div class="organizer-details">
+          <div class="form-group">
+            <label for="organizerName" class="form-label">Tên ban tổ chức</label>
+            <input
+              type="text"
+              id="organizerName"
+              name="organizerName"
+              class="form-input"
+              placeholder="Ví dụ: Công ty TNHH Sự Kiện ABC"
+              required
+              [(ngModel)]="eventData.organizer!.name"
+              (ngModelChange)="onDataChange()"
+              [class.error]="validationErrors['organizerName']"
+            />
+            <div *ngIf="validationErrors['organizerName']" class="error-message">
+              {{ validationErrors['organizerName'] }}
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="organizerBio" class="form-label">Giới thiệu gọn</label>
+            <textarea
+              id="organizerBio"
+              name="organizerBio"
+              class="form-textarea"
+              rows="4"
+              placeholder="Mô tả ngắn về ban tổ chức..."
+              required
+              [(ngModel)]="eventData.organizer!.bio"
+              (ngModelChange)="onDataChange()"
+              [class.error]="validationErrors['organizerBio']"
+            ></textarea>
+             <div *ngIf="validationErrors['organizerBio']" class="error-message">
+              {{ validationErrors['organizerBio'] }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <h3 class="section-title">Mô tả chi tiết</h3>
+      <div class="form-group full-width editor-container">
+        <label for="eventDescription" class="form-label">
+          <span>Nội dung mô tả</span>
+          <span class="char-count">
+            {{ getCharacterCount(eventData.eventDescription || '') }} ký tự
+          </span>
+        </label>
+        <textarea
+          id="eventDescription"
+          name="eventDescription"
+          class="form-textarea"
+          rows="8"
+          placeholder="Cung cấp thông tin chi tiết về sự kiện: mục đích, lịch trình, khách mời, hoạt động nổi bật..."
+          required
+          minlength="20"
+          [(ngModel)]="eventData.eventDescription"
+          (ngModelChange)="onDescriptionChange()"
+          [class.error]="validationErrors['eventDescription']"
+        ></textarea>
+        <div *ngIf="validationErrors['eventDescription']" class="error-message">
+          {{ validationErrors['eventDescription'] }}
+        </div>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <h3 class="section-title">Địa điểm tổ chức</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="province" class="form-label">Tỉnh/Thành phố</label>
+          <select
+            id="province"
+            name="province"
+            class="form-select"
+            required
+            [(ngModel)]="eventData.venue!.province"
+            (change)="onDataChange()"
+            [class.error]="validationErrors['province']"
+          >
+            <option value="" disabled>-- Chọn Tỉnh/Thành phố --</option>
+            <option *ngFor="let province of provinces" [value]="province">
+              {{ province }}
+            </option>
+          </select>
+          <div *ngIf="validationErrors['province']" class="error-message">
+            {{ validationErrors['province'] }}
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="address" class="form-label">Địa chỉ chi tiết</label>
+          <input
+            type="text"
+            id="address"
+            name="address"
+            class="form-input"
+            placeholder="Số nhà, tên đường, địa điểm cụ thể..."
+            required
+            [(ngModel)]="eventData.venue!.address"
+            (ngModelChange)="onDataChange()"
+            [class.error]="validationErrors['address']"
+          />
+           <div *ngIf="validationErrors['address']" class="error-message">
+            {{ validationErrors['address'] }}
+          </div>
+        </div>
+      </div>
+    </section>
+  </form>
+</div>

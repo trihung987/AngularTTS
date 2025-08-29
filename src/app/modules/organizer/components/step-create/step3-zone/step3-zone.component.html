@@ -1,0 +1,455 @@
+<div class="container">
+  <div class="main-wrapper">
+    <h1 class="main-title">Thiết kế sơ đồ chỗ ngồi</h1>
+
+    <div class="layout-grid">
+      <div class="sidebar">
+        <div class="panel">
+          <h2 class="panel-title">Tạo Zone Mới</h2>
+          <div class="form-group">
+            <label class="form-label">Tên Zone</label>
+            <input
+              type="text"
+              [(ngModel)]="newZone.name"
+              placeholder="e.g., VIP, Sân khấu"
+              class="form-input"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Màu sắc</label>
+            <div class="color-input-group">
+              <input
+                aria-label="Color Picker"
+                type="color"
+                [(ngModel)]="newZone.color"
+                class="color-picker"
+              />
+              <input
+                aria-label="Color"
+                type="text"
+                [(ngModel)]="newZone.color"
+                class="form-input color-text"
+              />
+            </div>
+          </div>
+          <div class="form-group form-check">
+            <input
+              type="checkbox"
+              id="isSellableNew"
+              [(ngModel)]="newZone.isSellable"
+              class="form-check-input"
+            />
+            <label for="isSellableNew" class="form-check-label"
+              >Zone bán vé</label
+            >
+          </div>
+
+          <div *ngIf="newZone.isSellable">
+            <div class="form-group">
+              <label class="form-label">Giá vé ($)</label>
+              <input
+                aria-label="Price"
+                type="number"
+                [(ngModel)]="newZone.price"
+                min="0"
+                step="5"
+                class="form-input"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Sức chứa tối đa (số vé)</label>
+              <input
+                aria-label="Max Tickets"
+                type="number"
+                [(ngModel)]="newZone.maxTickets"
+                min="0"
+                class="form-input"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Mô tả Zone</label>
+              <textarea
+                aria-label="Description"
+                [(ngModel)]="newZone.description"
+                class="form-textarea"
+                rows="3"
+                placeholder="e.g., Tầm nhìn đẹp, gần lối ra..."
+              ></textarea>
+            </div>
+            <div class="form-group toggle-switch">
+              <label class="form-label">Loại Zone</label>
+              <div>
+                <input
+                  aria-label="isSeatingZoneNew"
+                  type="checkbox"
+                  id="isSeatingZoneNew"
+                  [(ngModel)]="newZone.isSeatingZone"
+                  class="toggle-switch-input"
+                />
+                <label for="isSeatingZoneNew" class="toggle-switch-label">
+                  <span class="toggle-switch-inner"></span>
+                  <span class="toggle-switch-switch"></span>
+                </label>
+                <span class="toggle-status-label">{{
+                  newZone.isSeatingZone ? 'Zone có ghế ngồi' : 'Zone đứng'
+                }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Hình dạng</label>
+            <select
+              [(ngModel)]="newZone.shape"
+              class="form-select"
+              aria-label="Zone shape"
+            >
+              <option value="rectangle">Hình chữ nhật</option>
+              <option value="circle">Hình tròn</option>
+              <option value="ellipse">Hình elip</option>
+              <option value="triangle">Tam giác</option>
+              <option value="polygon">Lục giác</option>
+            </select>
+          </div>
+          <button
+            (click)="addZone()"
+            [disabled]="!newZone.name || !newZone.color"
+            class="btn-primary btn-full"
+          >
+            <span>+ Thêm Zone</span>
+          </button>
+        </div>
+
+        <div class="panel">
+          <h2 class="panel-title">Danh sách Zone</h2>
+          <div class="zone-list">
+            <div
+              *ngFor="let zone of zones"
+              class="zone-item"
+              [class.selected]="selectedZone?.id === zone.id"
+              (click)="selectZone(zone)"
+            >
+              <div class="zone-header">
+                <div class="zone-info">
+                  <div
+                    class="color-indicator"
+                    [style.background-color]="zone.color"
+                  ></div>
+                  <div class="zone-details">
+                    <p class="zone-name">
+                      {{ zone.name }}
+                      <span
+                        class="zone-type-indicator"
+                        *ngIf="zone.isSellable"
+                        >{{
+                          zone.isSeatingZone ? '(SEATING)' : '(STANDING)'
+                        }}</span
+                      >
+                    </p>
+                    <p class="zone-price" *ngIf="zone.isSellable">
+                      ${{ zone.price }}
+                    </p>
+                  </div>
+                </div>
+                <div class="zone-actions">
+                  <button
+                    (click)="editZone(zone); $event.stopPropagation()"
+                    class="btn-icon"
+                    title="Chỉnh sửa Zone"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    (click)="deleteZone(zone.id); $event.stopPropagation()"
+                    class="btn-icon btn-danger"
+                    title="Xóa Zone"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </div>
+              <div class="zone-stats">
+                <span *ngIf="zone.isSellable"
+                  >Sức chứa: {{ zone.maxTickets || 0 }} •
+                </span>
+                {{ getShapeLabel(zone.shape) }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="canvas-area">
+        <div class="panel tool">
+          <h3 class="panel-subtitle">🛠️ Công cụ</h3>
+          <div class="tool-buttons">
+            <button
+              (click)="setTool('zone')"
+              [class]="'btn-tool ' + (tool === 'zone' ? 'active' : '')"
+            >
+              🎯 Vẽ Zone
+            </button>
+            <button
+              (click)="setTool('select')"
+              [class]="'btn-tool ' + (tool === 'select' ? 'active' : '')"
+            >
+              👆 Chọn/Di chuyển
+            </button>
+          </div>
+
+          <div class="tool-actions" style="margin-top: 16px">
+            <button
+              (click)="showRemoveConfirmation()"
+              [disabled]="!canRemove"
+              class="btn-danger"
+              title="Xóa zone đã chọn"
+            >
+              🗑️ Xóa đã chọn
+            </button>
+            <div class="canvas-actions">
+              <button (click)="initializeCanvas()" class="btn-yellow">
+                🔄 Tải lại sơ đồ
+              </button>
+              <button (click)="showClearConfirmation()" class="btn-secondary">
+                🗑️ Xóa tất cả
+              </button>
+              <button (click)="exportLayout()" class="btn-success">
+                💾 Xuất sơ đồ
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel canvas-panel">
+          <div class="canvas-header">
+            <h2 class="panel-title">{{ currentEventName }} - Sơ đồ địa điểm</h2>
+          </div>
+
+          <div class="canvas-container">
+            <canvas
+              #canvas
+              width="1000"
+              height="700"
+              class="venue-canvas"
+              (mousedown)="onMouseDown($event)"
+              (mousemove)="onMouseMove($event)"
+              (mouseup)="onMouseUp($event)"
+              (click)="onCanvasClick($event)"
+            ></canvas>
+
+            <div class="instructions-overlay">
+              <div [ngSwitch]="tool">
+                <div *ngSwitchCase="'zone'">
+                  <strong>🎯 Vẽ Zone:</strong> Chọn zone từ danh sách, sau đó
+                  click và kéo trên canvas để vẽ.
+                </div>
+                <div *ngSwitchCase="'select'">
+                  <strong>👆 Chọn/Di chuyển:</strong> Click vào zone để chọn.
+                  Click và kéo để di chuyển.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="selectedZone" class="selection-info">
+            <div class="selected-item">
+              <strong>Zone đã chọn:</strong> {{ selectedZone.name }}
+              <span *ngIf="selectedZone.isSellable"
+                >(Sức chứa: {{ selectedZone.maxTickets || 0 }}, ${{
+                  selectedZone.price
+                }}
+                mỗi vé)</span
+              >
+              <span *ngIf="!selectedZone.isSellable"> (Trang trí)</span>
+            </div>
+          </div>
+
+          <div class="zone-statistics">
+            <div *ngFor="let zone of zones" class="stat-card">
+              <div class="stat-header">
+                <div
+                  class="stat-color"
+                  [style.background-color]="zone.color"
+                ></div>
+                <span class="stat-name">{{ zone.name }}</span>
+              </div>
+              <div class="stat-details">
+                <div
+                  class="stat-item"
+                  *ngIf="zone.isSellable; else decorative"
+                >
+                  Sức chứa: {{ zone.maxTickets || 0 }}
+                  <span class="zone-type-indicator"
+                    >{{ zone.isSeatingZone ? '(SEATING)' : '(STANDING)' }}
+                  </span>
+                </div>
+                <ng-template #decorative>
+                  <div class="stat-item">Trang trí</div>
+                </ng-template>
+                <div class="stat-item" *ngIf="zone.isSellable">
+                  Tổng: ${{ (zone.maxTickets || 0) * zone.price }}
+                </div>
+                <div class="stat-item">
+                  Hình: {{ getShapeLabel(zone.shape) }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="showClearDialog" class="modal-overlay" (click)="cancelClear()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <h3 class="modal-title">⚠️ Xóa tất cả Zone?</h3>
+        <p class="modal-message">
+          Điều này sẽ reset vị trí tất cả các zone. Hành động này không thể hoàn
+          tác.
+        </p>
+        <div class="modal-actions">
+          <button (click)="cancelClear()" class="btn-secondary">Hủy</button>
+          <button (click)="confirmClear()" class="btn-danger">
+            Đồng ý, xóa tất cả
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div
+      *ngIf="showRemoveDialog"
+      class="modal-overlay"
+      (click)="cancelRemove()"
+    >
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <h3 class="modal-title">🗑️ Xóa mục đã chọn?</h3>
+        <p class="modal-message" *ngIf="selectedZone">
+          Bạn có chắc muốn xóa zone "{{ selectedZone.name }}"?
+        </p>
+        <div class="modal-actions">
+          <button (click)="cancelRemove()" class="btn-secondary">Hủy</button>
+          <button (click)="confirmRemove()" class="btn-danger">Xóa</button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="editingZone" class="modal-overlay" (click)="cancelEdit()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <h3 class="modal-title">✏️ Chỉnh sửa Zone</h3>
+        <div class="modal-form">
+          <div class="form-group">
+            <label class="form-label">Tên Zone</label>
+            <input
+              aria-label="Zone name"
+              type="text"
+              [(ngModel)]="editingZone.name"
+              class="form-input"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Màu sắc</label>
+            <div class="color-input-group">
+              <input
+                aria-label="Color Picker"
+                type="color"
+                [(ngModel)]="editingZone.color"
+                class="color-picker"
+              />
+              <input
+                aria-label="Color"
+                type="text"
+                [(ngModel)]="editingZone.color"
+                class="form-input color-text"
+              />
+            </div>
+          </div>
+          <div class="form-group form-check">
+            <input
+              type="checkbox"
+              id="isSellableEdit"
+              [(ngModel)]="editingZone.isSellable"
+              class="form-check-input"
+            />
+            <label for="isSellableEdit" class="form-check-label"
+              >Zone bán vé</label
+            >
+          </div>
+
+          <div *ngIf="editingZone.isSellable">
+            <div class="form-group">
+              <label class="form-label">Giá vé ($)</label>
+              <input
+                aria-label="Price"
+                type="number"
+                [(ngModel)]="editingZone.price"
+                min="0"
+                step="5"
+                class="form-input"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Sức chứa tối đa (số vé)</label>
+              <input
+                aria-label="Max Tickets"
+                type="number"
+                [(ngModel)]="editingZone.maxTickets"
+                min="0"
+                class="form-input"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Mô tả Zone</label>
+              <textarea
+                aria-label="Description"
+                [(ngModel)]="editingZone.description"
+                class="form-textarea"
+                rows="3"
+                placeholder="e.g., Tầm nhìn đẹp, gần lối ra..."
+              ></textarea>
+            </div>
+            <div class="form-group toggle-switch">
+              <label class="form-label">Loại Zone</label>
+              <div>
+                <input
+                  aria-label="isSeatingZone"
+                  type="checkbox"
+                  id="isSeatingZoneEdit"
+                  [(ngModel)]="editingZone.isSeatingZone"
+                  class="toggle-switch-input"
+                />
+                <label for="isSeatingZoneEdit" class="toggle-switch-label">
+                  <span class="toggle-switch-inner"></span>
+                  <span class="toggle-switch-switch"></span>
+                </label>
+                <span class="toggle-status-label">{{
+                  editingZone.isSeatingZone ? 'Zone có ghế ngồi' : 'Zone đứng'
+                }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Hình dạng</label>
+            <select
+              [(ngModel)]="editingZone.shape"
+              name="shape"
+              class="form-select"
+              aria-label="Zone shape"
+            >
+              <option value="rectangle">Hình chữ nhật</option>
+              <option value="circle">Hình tròn</option>
+              <option value="ellipse">Hình elip</option>
+              <option value="triangle">Tam giác</option>
+              <option value="polygon">Lục giác</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button (click)="cancelEdit()" class="btn-secondary">Hủy</button>
+          <button (click)="saveEdit()" class="btn-primary">
+            Lưu thay đổi
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,378 @@
+/* src/app/components/events-list/components/event-card/event-card.component.css */
+.event-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid #e9ecef;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  z-index: 1;
+}
+
+.event-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border-color: #007bff;
+}
+
+/* Card Header - Optimized for 1:1 avatar images */
+.card-header {
+  position: relative;
+  height: 220px;
+  /* Tăng chiều cao để phù hợp với ảnh vuông */
+  overflow: hidden;
+  background: #f8f9fa;
+  /* Background fallback khi ảnh load */
+}
+
+.event-image-container {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1/16;
+}
+
+.event-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Giữ tỷ lệ và crop nếu cần */
+  object-position: center;
+  /* Căn giữa khi crop */
+  transition: transform 0.3s ease;
+  background: #f0f0f0;
+  /* Fallback background */
+}
+
+/* Đặc biệt xử lý cho ảnh 1:1 để tránh bị méo */
+.event-image[style*="aspect-ratio"] {
+  object-fit: cover;
+}
+
+.event-card:hover .event-image {
+  transform: scale(1.05);
+}
+
+/* Gradient overlay để text dễ đọc hơn trên ảnh */
+.event-image-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 0) 60%,
+      rgba(0, 0, 0, 0.1) 100%);
+  pointer-events: none;
+}
+
+/* Status Badge */
+.status-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.status-badge mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+.status-published {
+  background: rgba(40, 167, 69, 0.9);
+  border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+.status-draft {
+  background: rgba(255, 193, 7, 0.9);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+/* Card Body */
+.card-body {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.event-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 12px 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  min-height: 2.8rem;
+}
+
+/* Category */
+.event-category {
+  margin-bottom: 16px;
+}
+
+.category-chip {
+  /* background: #e3f2fd; */
+  color: #0d47a1;
+  font-size: 0.75rem;
+  font-weight: 500;
+  height: 24px;
+  border-radius: 12px;
+  padding: 0 8px;
+}
+
+/* Event Details */
+.event-details {
+  margin-bottom: 20px;
+  flex: 1;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.detail-item:last-child {
+  margin-bottom: 0;
+}
+
+.detail-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  color: #999;
+  flex-shrink: 0;
+}
+
+.detail-text {
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+}
+
+/* Statistics */
+.event-stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #007bff;
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: 4px;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 32px;
+  background: #dee2e6;
+  margin: 0 16px;
+}
+
+/* Card Footer */
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-top: 1px solid #e9ecef;
+  background: #fafafa;
+}
+
+.footer-info {
+  font-size: 0.75rem;
+  color: #999;
+}
+
+.footer-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.primary-action {
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 6px 16px;
+  border-radius: 6px;
+}
+
+.primary-action mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+}
+
+.delete-action {
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 6px 16px;
+  border-radius: 6px;
+  color: #dc3545;
+}
+
+.delete-action mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+  color: #dc3545;
+}
+
+.delete-action:hover {
+  background-color: #fff5f5;
+}
+
+/* Xử lý ảnh lỗi hoặc không tồn tại */
+.event-image[src=""],
+.event-image:not([src]) {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.event-image[src=""]:before,
+.event-image:not([src]):before {
+  content: '🎭';
+  font-size: 3rem;
+  color: white;
+  opacity: 0.8;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .card-header {
+    height: 180px;
+    /* Giảm chiều cao trên mobile */
+  }
+
+  .card-body {
+    padding: 16px;
+  }
+
+  .event-title {
+    font-size: 1rem;
+  }
+
+  .event-stats {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+
+  .stat-value {
+    font-size: 0.875rem;
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+  }
+
+  .card-footer {
+    padding: 12px 16px;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .footer-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-header {
+    height: 160px;
+  }
+
+  .status-badge {
+    font-size: 0.7rem;
+    padding: 4px 8px;
+    top: 8px;
+    left: 8px;
+  }
+}
+
+/* Loading skeleton */
+.event-card.loading {
+  pointer-events: none;
+}
+
+.event-card.loading .event-image {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.primary-action:focus,
+.delete-action:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+/* Smooth transitions cho các tương tác */
+.event-card * {
+  transition: all 0.2s ease;
+}
