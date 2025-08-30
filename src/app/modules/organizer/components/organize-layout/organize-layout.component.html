@@ -1,0 +1,61 @@
+<!-- event-layout.component.html -->
+<div class="layout-container" [@fadeIn]>
+  <!-- Navigation Header -->
+  <header class="navbar" [@slideIn]>
+    <div class="navbar-container" [@navItemStagger]>
+      <!-- Logo -->
+      <app-logo></app-logo>
+
+
+      <!-- Navigation Items -->
+      <nav class="navbar-nav">
+        <a
+          *ngFor="let item of navItems"
+          [routerLink]="item.route"
+          class="nav-item"
+          [class.active]="item.active"
+          (click)="updateActiveNavItem(item.route)"
+        >
+          <span class="nav-icon" [ngSwitch]="item.icon">
+            <svg *ngSwitchCase="'plus-circle'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="16"/>
+              <line x1="8" y1="12" x2="16" y2="12"/>
+            </svg>
+            <svg *ngSwitchCase="'calendar'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            <svg *ngSwitchCase="'bar-chart'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="20" x2="12" y2="10"/>
+              <line x1="18" y1="20" x2="18" y2="4"/>
+              <line x1="6" y1="20" x2="6" y2="16"/>
+            </svg>
+          </span>
+          <span class="nav-text">{{ item.label }}</span>
+        </a>
+      </nav>
+
+      <!-- Profile Menu -->
+       @if (isLogin() && !isLoading()) {
+        <app-user-menu [isLogin]="isLogin()"/>
+      } @else if (isLoading()) {
+        <div class="skeleton-wrapper">
+           <ngx-skeleton-loader count="1" appearance="circle" [theme]="{ 'width': '40px', 'height': '40px' }" />
+           <ngx-skeleton-loader count="1" appearance="line" [theme]="{ 'width': '100px', 'height': '30px' }" />
+        </div>
+      }
+
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- Footer -->
+   <app-footer></app-footer>
+</div>

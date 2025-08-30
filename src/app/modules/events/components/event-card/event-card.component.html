@@ -1,0 +1,71 @@
+<p-card styleClass="event-card">
+      <!-- Card Header with Image -->
+      <ng-template pTemplate="header">
+        <div class="event-image-container">
+          <img
+            alt=""
+            [src]="getEventImage()"
+            [alt]="event.eventName"
+            (error)="onImageError($event)"
+            class="event-image">
+
+          <!-- Category Tag -->
+          <p-tag
+            [value]="event.eventCategory"
+            severity="info"
+            styleClass="category-tag">
+          </p-tag>
+
+          <!-- Status Tag -->
+          <p-tag
+            [value]="getStatusText()"
+            [severity]="getStatusSeverity()"
+            styleClass="status-tag">
+          </p-tag>
+        </div>
+      </ng-template>
+
+      <!-- Card Content -->
+      <div class="event-content">
+        <h3 class="event-title">{{ event.eventName }}</h3>
+
+        <div class="event-info">
+          <div class="info-row">
+            <i class="pi pi-calendar text-primary"></i>
+            <span>{{ formatDateTime(event.startDate, event.startTime) }}</span>
+          </div>
+
+          <div class="info-row">
+            <i class="pi pi-map-marker text-primary"></i>
+            <span>{{ event.venue.address }}, {{ event.venue.province }}</span>
+          </div>
+
+          <div class="info-row">
+            <i class="pi pi-users text-primary"></i>
+            <span>{{ getAvailableSeats() }}/{{ getTotalSeats() }} chỗ trống</span>
+          </div>
+
+          <div class="info-row">
+            <i class="pi pi-user text-primary"></i>
+            <span>{{ event.organizer.name }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Footer -->
+      <ng-template pTemplate="footer">
+        <div class="event-footer">
+          <div class="price-section">
+            <span class="price">{{ formatPrice() }}</span>
+          </div>
+
+          <p-button
+            [label]="getButtonText()"
+            icon="pi pi-arrow-right"
+            styleClass="book-button"
+            [disabled]="isBookingDisabled()"
+            (click)="onBookEvent()">
+          </p-button>
+        </div>
+      </ng-template>
+    </p-card>

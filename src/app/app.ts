@@ -1,15 +1,20 @@
-import { Component, signal, ViewEncapsulation } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { FooterComponent } from "./core/components/footer/footer.component";
-import { HeaderComponent } from "./core/components/header/header.component";
+// src/app.ts
+
+import { Component, Inject, OnInit, PLATFORM_ID, ViewEncapsulation } from '@angular/core';
+import { NavigationCancel, NavigationEnd, NavigationError, Router, RouterOutlet } from '@angular/router';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { filter, first } from 'rxjs';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [CommonModule, RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css',
-  encapsulation: ViewEncapsulation.None, ////Phạm vi áp dụng của css - emulated = chỉ host component, None = toàn cục
+  encapsulation: ViewEncapsulation.None,
 })
-export class App {
-  protected readonly title = signal('projectDemoTTS');
+export class App{
+  isBrowser = false;
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+  }
 }

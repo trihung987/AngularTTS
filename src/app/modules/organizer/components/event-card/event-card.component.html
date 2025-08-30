@@ -1,0 +1,104 @@
+<!-- src/app/components/events-list/components/event-card/event-card.component.html -->
+<div class="event-card">
+  <!-- Card Header with Image -->
+  <div class="card-header">
+    <div class="event-image-container">
+      <img
+        [src]="getImg(event.eventImage)"
+        alt="imgEvent"
+        class="event-image"
+        (error)="onImageError($event)">
+
+      <!-- Status Badge -->
+      <div class="status-badge" [ngClass]="getStatusBadgeClass(event.status)">
+        <mat-icon>{{ event.status === 'PUBLISHED' ? 'publish' : 'edit' }}</mat-icon>
+        {{ getStatusText(event.status) }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Card Body -->
+  <div class="card-body">
+    <!-- Event Title -->
+    <h3 class="event-title" [title]="event.eventName">
+      {{ event.eventName }}
+    </h3>
+
+    <!-- Category -->
+    <div class="event-category">
+      <mat-chip style="  background: #0528dc33;" class="category-chip">{{ event.eventCategory }}</mat-chip>
+    </div>
+
+    <!-- Event Details -->
+    <div class="event-details">
+      <!-- Date and Time -->
+      <div class="detail-item">
+        <mat-icon class="detail-icon">schedule</mat-icon>
+        <span class="detail-text">
+          {{ formatTime(event.startTime) }} {{ formatDate(event.startDate) }}
+          <span *ngIf="event.endDate !== event.startDate">
+            - {{ formatTime(event.endTime) }} {{ formatDate(event.endDate) }}
+          </span>
+        </span>
+      </div>
+
+      <!-- Location -->
+      <div class="detail-item">
+        <mat-icon class="detail-icon">location_on</mat-icon>
+        <span class="detail-text" [title]="event.venue.address">
+          {{ event.venue.province }}
+        </span>
+      </div>
+
+      <!-- Organizer -->
+      <div class="detail-item">
+        <mat-icon class="detail-icon">person</mat-icon>
+        <span class="detail-text" [title]="event.organizer.name">
+          {{ event.organizer.name }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="event-stats">
+      <div class="stat-item">
+        <span class="stat-value">{{ event.zones.length | number }}</span>
+        <span class="stat-label">Zone</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-value">{{ event.totalSeats }}</span>
+        <span class="stat-label">Tổng số vé</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card Footer -->
+  <div class="card-footer">
+    <div class="footer-info">
+      <span class="updated-time">
+        Cập nhật: {{ formatDate(event.updatedDate) }}
+      </span>
+    </div>
+
+    <div class="footer-actions">
+      <button
+        mat-button
+        color="primary"
+        (click)="onEdit()"
+        class="primary-action">
+        <mat-icon>edit</mat-icon>
+        Chỉnh sửa
+      </button>
+
+      <button
+        mat-button
+        color="warn"
+        (click)="onDelete()"
+        class="delete-action">
+        <mat-icon>delete</mat-icon>
+        Xóa
+      </button>
+    </div>
+  </div>
+</div>

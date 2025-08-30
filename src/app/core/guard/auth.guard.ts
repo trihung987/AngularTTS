@@ -1,5 +1,46 @@
-import { CanActivateFn } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+// auth.guard.ts
+import { Injectable } from '@angular/core';
+import { CanActivate, CanMatch, GuardResult, MaybeAsync, Route, Router, UrlSegment, UrlTree } from '@angular/router';
+import { AuthService } from '../../modules/auth/services/auth.service';
+import { Observable } from 'rxjs';
+import { Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 
-export const authGuard: CanActivateFn = (route, state) => {
-  return true;
-};
+@Injectable({ providedIn: 'root' })
+export class AuthGuard implements CanActivate {
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private toastr: ToastrService,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {}
+
+  canActivate(): boolean | Observable<boolean> | Promise<boolean> {
+    if (isPlatformServer(this.platformId)) {
+      return true;
+    }
+    // Client-side check
+    if (isPlatformBrowser(this.platformId)) {
+      if (this.authService.isLogin()) {
+        console.log('Đã login từ guard');
+        return true;
+      }
+
+      // Hiển thị thông báo (chỉ client mới có DOM để toastr)
+      this.toastr.error(
+        'Vui lòng đăng nhập để truy cập trang này.',
+        'Từ chối truy cập'
+      );
+
+      this.authService.logout();
+
+      // Điều hướng về login
+      return this.router
+        .navigate(['/auth/login'], { replaceUrl: true })
+        .then(() => false);
+    }
+
+    return false;
+  }
+}

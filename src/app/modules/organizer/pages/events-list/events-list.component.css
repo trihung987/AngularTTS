@@ -1,0 +1,447 @@
+/* src/app/components/events-list/events-list.component.css */
+.events-list-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  min-height: calc(100vh - 200px);
+}
+
+/* Header Section */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.header-content {
+  flex: 1;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
+  line-height: 1.2;
+}
+
+.page-subtitle {
+  font-size: 1rem;
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.header-actions {
+  margin-left: 24px;
+}
+
+.create-btn {
+  padding: 12px 24px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.15);
+  transition: all 0.3s ease;
+}
+
+.create-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.25);
+}
+
+.create-btn mat-icon {
+  margin-right: 8px;
+}
+
+/* Filters Section */
+.filters-section {
+  margin-bottom: 24px;
+}
+
+.search-field {
+  width: 100%;
+  max-width: 400px;
+}
+
+.search-field .mat-mdc-form-field-wrapper {
+  padding-bottom: 0;
+}
+
+/* Tabs Section */
+.tabs-section {
+  margin-bottom: 32px;
+}
+
+.events-tabs {
+  background: transparent;
+}
+
+.events-tabs::ng-deep .mat-mdc-tab-group {
+  --mdc-tab-indicator-active-indicator-color: #007bff;
+  --mdc-secondary-navigation-tab-active-label-text-color: #007bff;
+}
+
+.events-tabs::ng-deep .mat-mdc-tab-header {
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.events-tabs::ng-deep .mat-mdc-tab {
+  min-width: 120px;
+  padding: 0 24px;
+  font-weight: 500;
+}
+
+.tab-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.tab-count {
+  background: #e9ecef;
+  color: #6c757d;
+  padding: 2px 1px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  min-width: 20px;
+  text-align: center;
+}
+
+.events-tabs::ng-deep .mat-mdc-tab.mdc-tab--active .tab-count {
+  background: #e3f2fd;
+  color: #0d47a1;
+}
+
+/* Content Section */
+.content-section {
+  min-height: 400px;
+}
+
+/* Loading State */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  color: #666;
+}
+
+.loading-container mat-spinner {
+  margin-bottom: 24px;
+}
+
+.loading-container p {
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  text-align: center;
+  color: #666;
+}
+
+.empty-icon {
+  margin-bottom: 24px;
+  opacity: 0.6;
+}
+
+.empty-icon mat-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  color: #ccc;
+}
+
+.empty-state h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 12px 0;
+}
+
+.empty-state p {
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 0 0 24px 0;
+  max-width: 400px;
+}
+
+/* Events Grid */
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 24px;
+  margin-bottom: 48px;
+}
+
+/* Dialog Styles */
+::ng-deep .delete-confirmation-dialog.p-dialog .p-dialog-header {
+  background: #fff;
+  border-bottom: 1px solid #e9ecef;
+  padding: 20px 24px 16px;
+  border-radius: 12px 12px 0 0;
+
+}
+
+::ng-deep .delete-confirmation-dialog.p-dialog .p-dialog-mask{
+  border-radius: 24px;
+
+}
+
+::ng-deep .delete-confirmation-dialog.p-dialog .p-dialog-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #dc3545;
+}
+
+::ng-deep .delete-confirmation-dialog.p-dialog .p-dialog-content {
+  padding: 24px;
+  background: #fff;
+  border-radius: 0 0 12px 12px;
+}
+
+::ng-deep .delete-confirmation-dialog.p-dialog .p-dialog-footer {
+  background: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+
+}
+
+/* Dialog inner content */
+.dialog-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.warning-icon {
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.warning-icon mat-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  color: #ff9800;
+}
+
+.dialog-message {
+  flex: 1;
+}
+
+.dialog-message h4 {
+  margin: 0 0 12px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.dialog-message p {
+  margin: 0 0 8px 0;
+  color: #666;
+  line-height: 1.5;
+}
+
+.dialog-message strong {
+  color: #333;
+  font-weight: 600;
+}
+
+.warning-text {
+  color: #dc3545 !important;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+/* PrimeNG Button Overrides */
+::ng-deep .p-button-secondary {
+  color: #6c757d !important;
+  border-color: #6c757d !important;
+}
+
+::ng-deep .p-button-secondary:hover {
+  background: #6c757d !important;
+  color: white !important;
+}
+
+::ng-deep .p-button-danger {
+  background: #dc3545 !important;
+  border-color: #dc3545 !important;
+}
+
+::ng-deep .p-button-danger:hover {
+  background: #c82333 !important;
+  border-color: #bd2130 !important;
+}
+
+::ng-deep .p-button-danger:disabled {
+  background: #dc3545 !important;
+  border-color: #dc3545 !important;
+  opacity: 0.6;
+}
+
+/* Responsive Dialog */
+@media (max-width: 768px) {
+  ::ng-deep .delete-confirmation-dialog.p-dialog {
+    width: 95% !important;
+    max-width: 400px !important;
+  }
+
+  .dialog-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .dialog-footer {
+    flex-direction: column;
+  }
+
+  ::ng-deep .delete-confirmation-dialog.p-dialog .p-dialog-footer .p-button {
+    width: 100%;
+    margin: 0 !important;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .events-list-container {
+    padding: 16px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .header-actions {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .create-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .events-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .page-title {
+    font-size: 1.75rem;
+  }
+
+  .tabs-section {
+    margin-bottom: 24px;
+  }
+
+  .events-tabs::ng-deep .mat-mdc-tab {
+    min-width: 80px;
+    padding: 0 12px;
+    font-size: 0.875rem;
+  }
+
+  .tab-count {
+    font-size: 0.7rem;
+    padding: 1px 6px;
+  }
+
+  /* Dialog responsive */
+  ::ng-deep .delete-confirmation-dialog .p-dialog {
+    width: 95% !important;
+    max-width: 400px !important;
+  }
+
+  .dialog-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .dialog-footer {
+    flex-direction: column;
+  }
+
+  ::ng-deep .delete-confirmation-dialog .p-dialog-footer .p-button {
+    width: 100%;
+    margin: 0 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .events-list-container {
+    padding: 12px;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .page-subtitle {
+    font-size: 0.875rem;
+  }
+
+  .events-tabs::ng-deep .mat-mdc-tab {
+    min-width: 60px;
+    padding: 0 8px;
+    font-size: 0.8rem;
+  }
+
+  .search-field {
+    max-width: 100%;
+  }
+}
+
+/* Focus and Hover States */
+.create-btn:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+/* Animation for grid items */
+.events-grid app-event-card {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Improved loading spinner */
+.loading-container mat-spinner::ng-deep circle {
+  stroke: #007bff;
+}

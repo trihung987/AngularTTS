@@ -1,0 +1,158 @@
+<div class="event-list-page">
+  <section class="page-header">
+    <div class="container">
+      <div class="header-content">
+        <div class="header-text">
+          <h1 class="page-title">Tất cả sự kiện</h1>
+          <p class="page-subtitle">
+            Khám phá hàng nghìn sự kiện thú vị đang chờ bạn.
+          </p>
+        </div>
+        <div class="header-stats">
+          <div class="stat-card">
+            <i class="pi pi-ticket"></i>
+            <div class="stat-info">
+              <span class="stat-number">{{ totalElements }}</span>
+              <span class="stat-label">Sự kiện</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="filters-section">
+    <div class="container">
+      <p-card styleClass="filters-card">
+        <div class="filters-grid">
+          <div class="search-container">
+            <span class="p-input-icon-left">
+              <i class="pi pi-search"></i>
+              <input
+                type="text"
+                pInputText
+                placeholder="Tìm kiếm tên sự kiện..."
+                class="w-full"
+                [value]="searchTerm"
+                (input)="onSearch($event)"
+              />
+            </span>
+          </div>
+
+          <p-select
+            [options]="categories"
+            [(ngModel)]="selectedCategory"
+            (onChange)="onCategoryChange()"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Chọn danh mục"
+          >
+            <ng-template pTemplate="trigger">
+              <button pButton class="p-select-trigger-button">
+                <span>{{
+                  getCategoryLabel(selectedCategory) || "Chọn danh mục"
+                }}</span>
+                <i class="pi pi-chevron-down"></i>
+              </button>
+            </ng-template>
+          </p-select>
+
+          <div class="sort-container">
+            <p-select
+              [options]="sortOptions"
+              [(ngModel)]="selectedSort"
+              (onChange)="onSortChange()"
+              optionLabel="label"
+              optionValue="value"
+            >
+              <ng-template pTemplate="trigger">
+                <button pButton class="p-select-trigger-button">
+                  <span>{{ getSelectedSortLabel() }}</span>
+                  <i class="pi pi-chevron-down"></i>
+                </button>
+              </ng-template>
+            </p-select>
+
+            <p-select
+              [options]="currentSortDirections"
+              [(ngModel)]="selectedSortDirection"
+              (onChange)="onSortDirectionChange()"
+              optionLabel="label"
+              optionValue="value"
+            >
+              <ng-template pTemplate="trigger">
+                <button pButton class="p-select-trigger-button">
+                  <span>{{ getSelectedSortDirectionLabel() }}</span>
+                  <i class="pi pi-chevron-down"></i>
+                </button>
+              </ng-template>
+            </p-select>
+          </div>
+        </div>
+      </p-card>
+    </div>
+  </section>
+
+  <section class="events-section">
+    <div class="container">
+      @if (isLoading()){
+      <!-- <div class="loading-container">
+        <p-progressSpinner
+          strokeWidth="4"
+          animationDuration=".5s"
+        ></p-progressSpinner>
+        <p class="loading-text">Đang tải sự kiện...</p>
+      </div> -->
+      <div class="loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Đang tải danh sách sự kiện...</p>
+      </div>
+      }@else{
+      <ng-container>
+        <div *ngIf="events.length === 0" class="empty-state">
+          <div class="empty-content">
+            <i class="pi pi-search empty-icon"></i>
+            <h2 class="empty-title">Không tìm thấy sự kiện</h2>
+            <p class="empty-description">
+              Rất tiếc, không có sự kiện nào phù hợp với tìm kiếm của bạn. Hãy
+              thử lại với các bộ lọc khác.
+            </p>
+            <p-button
+              label="Xóa bộ lọc"
+              icon="pi pi-refresh"
+              (click)="clearFilters()"
+            ></p-button>
+          </div>
+        </div>
+
+        <div *ngIf="events.length > 0">
+          <div class="events-grid" [class.list-view]="currentView === 'list'">
+            <app-event-card
+              *ngFor="let event of events; trackBy: trackByEventId"
+              [event]="event"
+              (bookEvent)="bookEvent($event)"
+            ></app-event-card>
+          </div>
+
+          <div
+            *ngIf="!isLoading() && events.length > 0 && totalPages > 1"
+            class="pagination-container"
+          >
+            <p-paginator
+              [first]="currentPage * pageSize"
+              [rows]="pageSize"
+              [totalRecords]="totalElements"
+              [showCurrentPageReport]="true"
+              currentPageReportTemplate="Hiển thị {first} - {last} trong tổng số {totalRecords} sự kiện"
+              [showPageLinks]="true"
+              [showJumpToPageDropdown]="true"
+              (onPageChange)="onPageChange($event)"
+            >
+            </p-paginator>
+          </div>
+        </div>
+      </ng-container>
+      }
+    </div>
+  </section>
+</div>

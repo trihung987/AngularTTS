@@ -1,0 +1,139 @@
+<div class="step-container" [@fadeInUp]>
+  <div class="step-header">
+    <h2 class="step-title">Thời gian & Đường dẫn</h2>
+    <p class="step-description">
+      Thiết lập lịch trình và URL cho sự kiện của bạn
+    </p>
+  </div>
+
+  <form class="event-form" #form="ngForm">
+    <div class="form-section">
+      <h3 class="section-title">Thời gian tổ chức</h3>
+
+      <div class="datetime-grid">
+        <div class="datetime-group">
+          <h4 class="datetime-title">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12,6 12,12 16,14" />
+            </svg>
+            Thời gian bắt đầu
+          </h4>
+
+          <div class="datetime-inputs">
+            <mat-form-field appearance="outline" class="form-group">
+              <mat-label>Ngày bắt đầu *</mat-label>
+              <input
+                aria-label="Start Date"
+                class="start-date-input"
+                matInput
+                [matDatepicker]="startDatePicker"
+                [(ngModel)]="eventData.startDate"
+                name="startDate"
+                (dateChange)="onDateTimeChange()"
+                [min]="minDate"
+                [max]="maxDate"
+                required
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="startDatePicker"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #startDatePicker></mat-datepicker>
+              <mat-error *ngIf="validationErrors['startDate']">
+                {{ validationErrors['startDate'] }}
+              </mat-error>
+            </mat-form-field>
+
+            <div
+              class="form-group time-input-wrapper"
+              [class.error]="validationErrors['startTime']"
+            >
+              <label for="startTime" class="form-label">Giờ bắt đầu *</label>
+              <input
+                id="startTime"
+                type="time"
+                [(ngModel)]="eventData.startTime"
+                name="startTime"
+                (change)="onDateTimeChange()"
+                class="form-input"
+                required
+              />
+              <div *ngIf="validationErrors['startTime']" class="error-message">
+                {{ validationErrors['startTime'] }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="datetime-group">
+          <h4 class="datetime-title">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12,6 12,12 8,10" />
+            </svg>
+            Thời gian kết thúc
+          </h4>
+
+          <div class="datetime-inputs">
+            <mat-form-field appearance="outline" class="form-group">
+              <mat-label>Ngày kết thúc *</mat-label>
+              <input
+                aria-label="End Date"
+                matInput
+                [matDatepicker]="endDatePicker"
+                [(ngModel)]="eventData.endDate"
+                name="endDate"
+                (dateChange)="onDateTimeChange()"
+                [min]="eventData.startDate"
+                [max]="maxDate"
+                required
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="endDatePicker"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #endDatePicker></mat-datepicker>
+              <mat-error *ngIf="validationErrors['endDate']">
+                {{ validationErrors['endDate'] }}
+              </mat-error>
+            </mat-form-field>
+
+            <div
+              class="form-group time-input-wrapper"
+              [class.error]="validationErrors['endTime'] || dateTimeConflict"
+            >
+              <label for="endTime" class="form-label">Giờ kết thúc *</label>
+              <input
+                id="endTime"
+                type="time"
+                [(ngModel)]="eventData.endTime"
+                name="endTime"
+                (change)="onDateTimeChange()"
+                class="form-input"
+                required
+              />
+              <div *ngIf="validationErrors['endTime']" class="error-message">
+                {{ validationErrors['endTime'] }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </form>
+</div>

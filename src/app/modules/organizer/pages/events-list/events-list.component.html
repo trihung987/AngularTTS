@@ -1,0 +1,142 @@
+<div class="events-list-container">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Sự kiện của tôi</h1>
+      <p class="page-subtitle">Quản lý và theo dõi tất cả sự kiện của bạn</p>
+    </div>
+    <div class="header-actions">
+      <button
+        mat-raised-button
+        color="primary"
+        class="create-btn"
+        (click)="createNewEvent()">
+        <mat-icon>add</mat-icon>
+        Tạo sự kiện mới
+      </button>
+    </div>
+  </div>
+
+  <div class="filters-section">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Tìm kiếm sự kiện</mat-label>
+      <input
+        matInput
+        placeholder="Nhập tên sự kiện..."
+        (input)="onSearch($event)"
+        [value]="searchQuery">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+  </div>
+
+  <div class="tabs-section">
+    <mat-tab-group
+      [(selectedIndex)]="selectedTab"
+      (selectedIndexChange)="onTabChange($event)"
+      class="events-tabs">
+      <mat-tab
+        *ngFor="let tab of tabs; let i = index"
+        [label]="tab.label">
+        <ng-template mat-tab-label>
+          <span class="tab-label">
+            {{ tab.label }}
+            <span class="tab-count" *ngIf="i === selectedTab && totalElements > 0">
+              {{ totalElements }}
+            </span>
+          </span>
+        </ng-template>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+
+  <div class="content-section">
+    <div *ngIf="loading()" class="loading-container">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Đang tải danh sách sự kiện...</p>
+    </div>
+
+    <div *ngIf="!loading() && events.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <mat-icon>event_available</mat-icon>
+      </div>
+      <h3>{{ searchQuery ? 'Không tìm thấy sự kiện' : 'Chưa có sự kiện nào' }}</h3>
+      <p *ngIf="searchQuery">
+        Không có sự kiện nào phù hợp với từ khóa "{{ searchQuery }}"
+      </p>
+      <p *ngIf="!searchQuery">
+        Bạn chưa tạo sự kiện nào. Hãy bắt đầu bằng cách tạo sự kiện đầu tiên của bạn!
+      </p>
+      <button
+        *ngIf="!searchQuery"
+        mat-raised-button
+        color="primary"
+        (click)="createNewEvent()">
+        <mat-icon>add</mat-icon>
+        Tạo sự kiện đầu tiên
+      </button>
+    </div>
+
+    <div *ngIf="!loading() && events.length > 0" class="events-grid">
+      <app-event-card
+        *ngFor="let event of events; trackBy: trackByEventId"
+        [event]="event"
+        (edit)="onEventEdit($event)"
+        (delete)="onEventDelete($event)">
+      </app-event-card>
+    </div>
+
+    <app-events-pagination
+      *ngIf="!loading() && events.length > 0"
+      [currentPage]="currentPage"
+      [totalPages]="totalPages"
+      [totalElements]="totalElements"
+      [pageSize]="pageSize"
+      (pageChange)="onPageChange($event)">
+    </app-events-pagination>
+  </div>
+</div>
+
+<!-- Delete Confirmation Dialog -->
+<p-dialog
+  [(visible)]="showDeleteDialog"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="delete-confirmation-dialog"
+  header="Xác nhận xóa sự kiện"
+  [style]="{width: '450px'}">
+
+  <div class="dialog-content">
+    <div class="warning-icon">
+      <mat-icon color="warn">warning</mat-icon>
+    </div>
+
+    <div class="dialog-message">
+      <h4>Bạn có chắc chắn muốn xóa sự kiện này?</h4>
+      <p *ngIf="eventToDelete">
+        <strong>"{{ eventToDelete.eventName }}"</strong>
+      </p>
+      <p class="warning-text">
+        Hành động này không thể hoàn tác. Tất cả dữ liệu liên quan đến sự kiện sẽ bị xóa vĩnh viễn.
+      </p>
+    </div>
+  </div>
+
+  <div class="dialog-footer">
+    <p-button
+      label="Hủy"
+      icon="pi pi-times"
+      styleClass="p-button-text p-button-secondary"
+      [disabled]="isDeleting"
+      (click)="hideDeleteDialog()">
+    </p-button>
+
+    <p-button
+      label="Xóa sự kiện"
+      icon="pi pi-trash"
+      styleClass="p-button-danger"
+      [loading]="isDeleting"
+      (click)="confirmDelete()">
+    </p-button>
+  </div>
+</p-dialog>
