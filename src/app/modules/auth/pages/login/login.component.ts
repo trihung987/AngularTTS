@@ -52,7 +52,6 @@ export class LoginComponent implements OnInit {
     const displayNames: { [key: string]: string } = {
       username: 'Username',
       password: 'Mật khẩu',
-      terms: 'Điều khoản sử dụng',
     };
     return displayNames[fieldName] || fieldName;
   }
@@ -63,16 +62,24 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log("page login")
     this.loginForm = this.fb.group(
       {
         username: ['', [Validators.required]],
         password: ['', [Validators.required]],
-        terms: [false, [Validators.requiredTrue]],
       },
       {
         updateOn: 'submit',
       } as AbstractControlOptions
     );
+  }
+
+  navigateToRegister(): void {
+    this.router.navigate(['/auth/register']);
+  }
+
+  navigateToHome(): void {
+    this.router.navigate(['/']);
   }
 
   onSubmit(): void {
@@ -95,7 +102,7 @@ export class LoginComponent implements OnInit {
     const loginData: LoginRequest = {
       username: this.loginForm.value.username,
       password: this.loginForm.value.password,
-      };
+    };
 
     this.authService.login(loginData).subscribe({
       next: (res) => {
@@ -108,7 +115,7 @@ export class LoginComponent implements OnInit {
           `Chào mừng bạn quay trở lại`
         );
 
-        this.router.navigate(["/"]);
+        this.router.navigate(['/']);
       },
       error: (err) => {
         this.isLoading.set(false);

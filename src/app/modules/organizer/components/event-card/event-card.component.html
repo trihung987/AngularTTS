@@ -10,9 +10,9 @@
         (error)="onImageError($event)">
 
       <!-- Status Badge -->
-      <div class="status-badge" [ngClass]="getStatusBadgeClass(event.status)">
-        <mat-icon>{{ event.status === 'PUBLISHED' ? 'publish' : 'edit' }}</mat-icon>
-        {{ getStatusText(event.status) }}
+      <div class="status-badge" [ngClass]="getStatusBadgeClass(event.eventStatus)">
+        <mat-icon>{{ event.eventStatus === 'PUBLISHED' ? 'publish' : 'edit' }}</mat-icon>
+        {{ getStatusText(event.eventStatus) }}
       </div>
     </div>
   </div>
@@ -26,7 +26,7 @@
 
     <!-- Category -->
     <div class="event-category">
-      <mat-chip style="  background: #0528dc33;" class="category-chip">{{ event.eventCategory }}</mat-chip>
+      <mat-chip style="background: #0528dc33;" class="category-chip">{{ event.eventCategory }}</mat-chip>
     </div>
 
     <!-- Event Details -->
@@ -82,11 +82,24 @@
     </div>
 
     <div class="footer-actions">
+      <!-- View Detail Button - Only for Published Events -->
+      <button
+        *ngIf="isPublished()"
+        mat-button
+        color="accent"
+        (click)="onViewDetail()"
+        class="detail-action"
+        title="Xem chi tiết sự kiện">
+        <mat-icon>visibility</mat-icon>
+        Xem chi tiết
+      </button>
+
       <button
         mat-button
         color="primary"
         (click)="onEdit()"
-        class="primary-action">
+        class="primary-action"
+        title="Chỉnh sửa sự kiện">
         <mat-icon>edit</mat-icon>
         Chỉnh sửa
       </button>
@@ -95,7 +108,8 @@
         mat-button
         color="warn"
         (click)="onDelete()"
-        class="delete-action">
+        class="delete-action"
+        title="Xóa sự kiện">
         <mat-icon>delete</mat-icon>
         Xóa
       </button>

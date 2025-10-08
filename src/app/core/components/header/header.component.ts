@@ -30,7 +30,7 @@ import { Observable, finalize, of } from 'rxjs'; // Import Observable
 export class HeaderComponent implements OnInit {
   isMenuOpen = false;
   isLoading = signal(true);
-
+  isAdmin = signal(false);
   isLogin = signal(false);
   user$: Observable<UserDto | null>;
 
@@ -55,6 +55,9 @@ export class HeaderComponent implements OnInit {
           })
           .finally(() => {
             this.isLoading.set(false);
+            if (this.authService.getUser()?.roles.some(role => role.name === 'ADMIN')) {
+              this.isAdmin.set(true);
+            }
           });
       } catch (error) {
         console.error('Failed to reload user on init:', error);
@@ -76,3 +79,5 @@ export class HeaderComponent implements OnInit {
     this.router.navigate([path]);
   }
 }
+
+

@@ -1,0 +1,238 @@
+<div class="orders-container">
+  <!-- Section Header -->
+  <div class="section-header">
+    <h3 class="section-title">
+      <i class="fas fa-list-ul"></i>
+      Danh sách đơn hàng
+    </h3>
+    <!-- <div class="action-buttons">
+      <button class="btn btn-secondary" (click)="exportToExcel()">
+        <i class="fas fa-download"></i>
+        Xuất Excel
+      </button>
+      <button class="btn btn-primary" (click)="createNewOrder()">
+        <i class="fas fa-plus"></i>
+        Tạo đơn mới
+      </button>
+    </div> -->
+  </div>
+
+  <!-- Search and Filter Bar -->
+  <div class="search-filter-bar">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input
+        type="text"
+        placeholder="Tìm kiếm theo mã đơn.."
+        [value]="searchTerm()"
+        (input)="onSearchChange($any($event.target).value)"
+      />
+    </div>
+
+    <select
+      aria-label="Chọn Zone"
+      class="filter-select"
+      (change)="onZoneFilterChange($any($event.target).value)"
+      [value]="selectedZoneId()">
+      <option value="">Tất cả Zone</option>
+      @for (zone of availableZones(); track zone.id) {
+        <option [value]="zone.id">
+          {{ zone.name }}
+        </option>
+      }
+    </select>
+
+    <select
+      aria-label="Sắp xếp theo"
+      class="filter-select"
+      (change)="onSortChange($any($event.target).value)"
+      [value]="sortBy() + '_' + sortDirection()">
+      <option value="createdAt_DESC">Sắp xếp: Mới nhất</option>
+      <option value="createdAt_ASC">Cũ nhất</option>
+      <option value="totalAmount_DESC">Giá cao nhất</option>
+      <option value="totalAmount_ASC">Giá thấp nhất</option>
+      <option value="quantity_DESC">Số lượng nhiều nhất</option>
+      <option value="quantity_ASC">Số lượng ít nhất</option>
+    </select>
+  </div>
+
+  <!-- Filter Info -->
+  @if (hasActiveFilters()) {
+    <div class="filter-info">
+      <i class="fas fa-filter"></i>
+      <span>
+        Đang lọc:
+        @if (selectedZoneId()) {
+          <strong>{{ selectedZoneName() }}</strong>
+        }
+        @if (searchTerm()) {
+          <strong> • Tìm kiếm: "{{ searchTerm() }}"</strong>
+        }
+      </span>
+      <button class="btn-clear-filter" (click)="clearFilters()">
+        <i class="fas fa-times"></i> Xóa bộ lọc
+      </button>
+    </div>
+  }
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="loading-message">
+      <i class="fas fa-spinner fa-spin"></i>
+      Đang tải dữ liệu...
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error() && !loading()) {
+    <div class="error-message">
+      <i class="fas fa-exclamation-circle"></i>
+      {{ error() }}
+    </div>
+  }
+
+  <!-- Orders Table -->
+  @if (!loading() && !error()) {
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th><i class="fas fa-hashtag"></i> Mã đơn</th>
+            <th><i class="fas fa-map-marker-alt"></i> Zone</th>
+            <th><i class="fas fa-money-bill"></i> Đơn giá</th>
+            <th><i class="fas fa-calendar"></i> Ngày mua</th>
+            <th><i class="fas fa-ticket-alt"></i> Số lượng</th>
+            <th><i class="fas fa-dollar-sign"></i> Tổng tiền</th>
+            <th><i class="fas fa-cog"></i> Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (order of orders(); track order.id) {
+            <tr>
+              <td>
+                <div class="order-id">
+                  <i class="fas fa-file-invoice"></i>
+                  {{ order.id.substring(0, 8) }}...
+                </div>
+              </td>
+              <td>
+                <span class="zone-badge">
+                  <i class="fas" [ngClass]="getZoneIcon(order.nameZone)" [style.color]="getZoneIconColor(order.nameZone)"></i>
+                  {{ order.nameZone }}
+                </span>
+              </td>
+              <td><span class="price">{{ formatCurrency(order.priceZone) }}</span></td>
+              <td>{{ formatDate(order.createdAt) }}</td>
+              <td><span class="quantity-badge">{{ order.quantity }} vé</span></td>
+              <td><span class="total-amount">{{ formatCurrency(order.totalAmount) }}</span></td>
+              <td>
+                <button
+                  aria-label="Xem chi tiết đơn hàng"
+                  class="btn btn-secondary btn-sm"
+                  (click)="viewOrderDetail(order)"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="no-data">
+                <i class="fas fa-inbox"></i>
+                <p>Không có đơn hàng nào</p>
+                @if (hasActiveFilters()) {
+                  <small>Thử xóa bộ lọc để xem tất cả đơn hàng</small>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <!-- Pagination -->
+  @if (totalPages() > 1 && !loading()) {
+    <div class="pagination">
+      <button
+        class="btn btn-secondary"
+        [disabled]="currentPage() === 0"
+        (click)="goToPage(currentPage() - 1)"
+      >
+        <i class="fas fa-chevron-left"></i>
+        Trước
+      </button>
+      <span class="page-info">
+        Trang {{ currentPage() + 1 }} / {{ totalPages() }} ({{ totalElements() }} kết quả)
+      </span>
+      <button
+        class="btn btn-secondary"
+        [disabled]="currentPage() >= totalPages() - 1"
+        (click)="goToPage(currentPage() + 1)"
+      >
+        Sau
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+  }
+
+  <!-- Zone Statistics Section -->
+  <div class="section-header" style="margin-top: 40px">
+    <h3 class="section-title">
+      <i class="fas fa-map-marked-alt"></i>
+      Tình trạng vé theo Zone
+    </h3>
+  </div>
+
+  <div class="zone-cards-container">
+    @for (zone of availableZones(); track zone.id) {
+      <div class="zone-card" [class.selected]="selectedZoneId() === zone.id.toString()">
+        <div class="zone-header">
+          <div class="zone-name">
+            <i class="fas" [ngClass]="getZoneIcon(zone.name)" [style.color]="getZoneIconColor(zone.name)"></i>
+            {{ zone.name }}
+          </div>
+          <div class="zone-capacity">
+            {{ getZoneRemainingTickets(zone.id.toString()) }}/{{ zone.maxTickets }} vé
+          </div>
+        </div>
+        <div class="progress-bar">
+          <div
+            class="progress-fill"
+            [style.width.%]="getZoneSoldPercentage(zone.id.toString())"
+            [style.background]="getProgressBarColor(getZoneSoldPercentage(zone.id.toString()))">
+          </div>
+        </div>
+        <div class="progress-label">
+          Đã bán: {{ zone.soldTickets }} vé ({{ getZoneSoldPercentage(zone.id.toString()).toFixed(1) }}%) •
+          Còn lại: {{ getZoneRemainingTickets(zone.id.toString()) }} vé •
+          Giá: {{ formatCurrency(zone.price) }}
+        </div>
+        <div class="zone-revenue">
+          <i class="fas fa-money-bill-wave"></i>
+          Doanh thu: {{ formatCurrency(zoneStats().get(zone.id.toString())?.revenue || 0) }}
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Alert Box for Almost Full Zones -->
+  @if (hasAlmostFullZones()) {
+    <div class="alert-box">
+      <div class="alert-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <div class="alert-content">
+        <h4>Lưu ý quan trọng</h4>
+        <p>
+          @for (zone of almostFullZones(); track zone.id; let last = $last) {
+            <span>
+              <strong>{{ zone.name }}</strong> sắp hết vé! Chỉ còn {{ getZoneRemainingTickets(zone.id.toString()) }} vé trống@if (!last) {<span>. </span>}
+            </span>
+          }
+          Vui lòng cập nhật tình trạng để tránh bán quá số lượng.
+        </p>
+      </div>
+    </div>
+  }
+</div>

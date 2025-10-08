@@ -2,7 +2,7 @@
 import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -75,11 +75,14 @@ export class EventsListComponent implements OnInit, OnDestroy {
     { label: 'Tất cả', status: 'ALL' as const },
     { label: 'Bản nháp', status: 'DRAFT' as const },
     { label: 'Đã xuất bản', status: 'PUBLISHED' as const },
+    { label: 'Đã từ chối', status: 'REJECTED' as const },
+    { label: 'Đã chờ duyệt', status: 'PENDING' as const },
   ];
 
   constructor(
     private eventsListService: EventsListService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
@@ -145,6 +148,11 @@ export class EventsListComponent implements OnInit, OnDestroy {
   onPageChange(page: number) {
     this.currentPage = page;
     this.loadEvents();
+    this.scrollToTop();
+  }
+
+  private scrollToTop(): void {
+    window.scrollTo({ top: 0 });
   }
 
   onEventEdit(eventId: string) {

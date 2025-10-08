@@ -1,0 +1,184 @@
+<div *ngIf="isLoading()" class="loading-overlay">Đang tải dữ liệu...</div>
+<div *ngIf="error" class="error-message">{{ error }}</div>
+
+<ng-container *ngIf="event">
+  <!-- Existing content remains the same -->
+  <div class="all">
+    <div class="banner">
+      <div class="concert-container">
+        <div class="info-panel">
+          <div>
+            <h1 class="concert-title">{{ event.eventName }}</h1>
+
+            <div class="event-details">
+              <div class="detail-row">
+                <span class="detail-icon">🗓️</span>
+                <div>
+                  {{ event.startTime }} - {{ event.endTime }},
+                  {{ formatDate(event.startDate) }}
+                </div>
+              </div>
+
+              <div class="detail-row">
+                <span class="detail-icon">📍</span>
+                <div>
+                  <div class="venue-name">{{ event.venue.address }}</div>
+                  <div class="venue-address">{{ event.venue.province }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="pricing">
+              <div class="price-label">Giá từ</div>
+              <div class="price-amount">
+                {{ formatCurrency(getMinPrice()) }}
+              </div>
+            </div>
+            <button class="buy-btn" (click)="navigateToZoneSelection()" [disabled]="isLateTime() || isAllSoldOut()"
+              [class.disabled]="isLateTime() || isAllSoldOut()">
+              {{ isLateTime() ? "Đã diễn ra" : isAllSoldOut()? "Hết vé" : "Mua vé ngay" }}
+            </button>
+          </div>
+        </div>
+
+        <div
+          class="event-banner"
+          [style.background-image]="'url(' + event.eventBanner + ')'"
+        ></div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="left-content">
+        <div class="detail-content">
+          <h2>Giới thiệu</h2>
+          <div
+            class="intro-content"
+            [class.expanded]="isDescriptionExpanded()"
+            [innerHTML]="event.eventDescription"
+          ></div>
+
+          <img
+            *ngIf="isDescriptionExpanded()"
+            class="event-image-full"
+            [src]="event.eventImage"
+            alt="event.eventName"
+          />
+
+          <div class="toggle-btn" (click)="toggleDescription()">
+            {{ isDescriptionExpanded() ? "Thu gọn ▲" : "Xem thêm ▼" }}
+          </div>
+        </div>
+
+        <div class="ticket-info">
+          <div class="ticket-header">
+            <div class="ticket-info-header">
+              <div>Thông tin vé</div>
+              <span
+                >{{ event.startTime }} - {{ event.endTime }},
+                {{ formatDate(event.startDate) }}</span
+              >
+            </div>
+            <button class="buy-btn" (click)="navigateToZoneSelection()" [disabled]="isLateTime() || isAllSoldOut()"
+              [class.disabled]="isLateTime() || isAllSoldOut()">
+              {{ isLateTime() ? "Đã diễn ra" : isAllSoldOut()? "Hết vé" : "Mua vé ngay" }}
+            </button>
+          </div>
+
+          <div class="ticket-body">
+            <div *ngFor="let zone of getSellableZones()" class="ticket-row">
+              <div class="ticket-name">
+                {{ zone.name }}
+                {{ zone.isSeatingZone ? "(Seated)" : "(Standing)" }}
+              </div>
+              <div class="ticket-price">{{ formatCurrency(zone.price) }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="organizer">
+          <h1>Ban tổ chức</h1>
+          <div class="org-content">
+            <div class="left-org">
+              <img
+                class="logo"
+                [src]="event.organizer.logo"
+                alt="event.organizer.name"
+              />
+            </div>
+            <div class="right-org">
+              <h1 class="org-name">{{ event.organizer.name }}</h1>
+              <p class="org-bio">{{ event.organizer.bio }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<!-- Reservation Dialog - MOVED OUTSIDE ng-container -->
+<p-dialog
+  [(visible)]="showReservationDialog"
+  [modal]="true"
+  [closable]="false"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '90%', 'max-width': '500px' }"
+  styleClass="reservation-dialog"
+  header="Đặt vé đang chờ xử lý">
+
+  <!-- Dialog Content -->
+  <div class="dialog-content">
+    <div class="dialog-icon">
+      <i class="pi pi-info-circle"></i>
+    </div>
+
+    <div class="dialog-message">
+      <p>Bạn có một đơn đặt vé đang chờ xử lý.</p>
+
+      <div class="reservation-details" *ngIf="existingReservation">
+        <strong>Mã giữ chỗ:</strong><br>
+
+        <div class="reservation-id">
+          <span class="highlight">{{ existingReservation }}</span>
+        </div>
+      </div>
+
+      <p class="dialog-question">Bạn có muốn tiếp tục với đơn đặt vé này không?</p>
+
+      <div *ngIf="isCancellingReservation()" class="cancelling-loader">
+        <i class="pi pi-spin pi-spinner"></i>
+        <span>Đang hủy đặt vé...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dialog Footer -->
+  <ng-template pTemplate="footer" #footer>
+    <div class="custom-dialog-footer">
+      <button
+        aria-label="Hủy đặt vé"
+        pButton
+        type="button"
+        label="Hủy đặt vé"
+        icon="pi pi-times"
+        class="p-button-text p-button-danger"
+        [disabled]="isCancellingReservation()"
+        (click)="cancelExistingReservation()">
+      </button>
+      <button
+        aria-label="Tiếp tục đặt vé"
+        pButton
+        type="button"
+        label="Tiếp tục"
+        icon="pi pi-check"
+        class="p-button-primary"
+        [disabled]="isCancellingReservation()"
+        (click)="continueReservation()">
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>

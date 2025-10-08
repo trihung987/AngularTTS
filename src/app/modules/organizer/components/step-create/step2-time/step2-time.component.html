@@ -29,8 +29,9 @@
 
           <div class="datetime-inputs">
             <mat-form-field appearance="outline" class="form-group">
-              <mat-label>Ngày bắt đầu *</mat-label>
+              <mat-label><line-required label="Ngày bắt đầu"/></mat-label>
               <input
+                #startDateInput
                 aria-label="Start Date"
                 class="start-date-input"
                 matInput
@@ -40,7 +41,7 @@
                 (dateChange)="onDateTimeChange()"
                 [min]="minDate"
                 [max]="maxDate"
-                required
+                placeholder="dd/MM/yyyy"
               />
               <mat-datepicker-toggle
                 matSuffix
@@ -56,8 +57,9 @@
               class="form-group time-input-wrapper"
               [class.error]="validationErrors['startTime']"
             >
-              <label for="startTime" class="form-label">Giờ bắt đầu *</label>
+              <label for="startTime" class="form-label"><line-required label="Giờ bắt đầu"/></label>
               <input
+                aria-label="Start Time"
                 id="startTime"
                 type="time"
                 [(ngModel)]="eventData.startTime"
@@ -91,8 +93,9 @@
 
           <div class="datetime-inputs">
             <mat-form-field appearance="outline" class="form-group">
-              <mat-label>Ngày kết thúc *</mat-label>
+              <mat-label><line-required label="Ngày kết thúc"/></mat-label>
               <input
+                #endDateInput
                 aria-label="End Date"
                 matInput
                 [matDatepicker]="endDatePicker"
@@ -101,7 +104,6 @@
                 (dateChange)="onDateTimeChange()"
                 [min]="eventData.startDate"
                 [max]="maxDate"
-                required
               />
               <mat-datepicker-toggle
                 matSuffix
@@ -117,15 +119,15 @@
               class="form-group time-input-wrapper"
               [class.error]="validationErrors['endTime'] || dateTimeConflict"
             >
-              <label for="endTime" class="form-label">Giờ kết thúc *</label>
+              <label for="endTime" class="form-label"><line-required label="Giờ kết thúc"/></label>
               <input
+                aria-label="End Time"
                 id="endTime"
                 type="time"
                 [(ngModel)]="eventData.endTime"
                 name="endTime"
                 (change)="onDateTimeChange()"
                 class="form-input"
-                required
               />
               <div *ngIf="validationErrors['endTime']" class="error-message">
                 {{ validationErrors['endTime'] }}

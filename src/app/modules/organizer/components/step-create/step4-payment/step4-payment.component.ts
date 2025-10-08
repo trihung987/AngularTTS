@@ -20,11 +20,12 @@ import {
   CreateEventService,
   EventData,
 } from '../../../services/events.service';
+import { RequiredComponent } from "../../../../../shared/components/required/required.component";
 
 @Component({
   selector: 'step4-payment',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RequiredComponent],
   templateUrl: './step4-payment.component.html',
   styleUrls: ['./step4-payment.component.css'],
   animations: [
@@ -97,7 +98,7 @@ export class Step4PaymentComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  private loadInitialData() {
+  public loadInitialData() {
     const savedData = this.createEventService.getCurrentEventData();
     if (savedData && savedData.bankInfo) {
       this.eventData.bankInfo = {
@@ -228,8 +229,8 @@ export class Step4PaymentComponent implements OnInit, OnDestroy {
     this.eventData.bankInfo!.accountNumber = value;
     this.formattedAccountNumber = this.formatAccountNumber(value);
 
-    // Update input display
-    input.value = this.formattedAccountNumber;
+
+    //input.value = this.formattedAccountNumber;
     this.onDataChange();
   }
 
@@ -277,14 +278,17 @@ export class Step4PaymentComponent implements OnInit, OnDestroy {
     ) {
       this.validationErrors['accountHolder'] = 'Tên chủ tài khoản là bắt buộc';
       isValid = false;
+      console.log('holder1', isValid);
     } else if (this.eventData.bankInfo.accountHolder.trim().length < 2) {
       this.validationErrors['accountHolder'] =
         'Tên chủ tài khoản phải có ít nhất 2 ký tự';
       isValid = false;
+      console.log('holder2', isValid);
     } else if (!/^[A-Z\s]+$/.test(this.eventData.bankInfo.accountHolder)) {
       this.validationErrors['accountHolder'] =
         'Tên chủ tài khoản chỉ được chứa chữ cái viết hoa và khoảng trắng';
       isValid = false;
+      console.log('holder3', isValid);
     }
 
     // Validate account number
@@ -294,13 +298,16 @@ export class Step4PaymentComponent implements OnInit, OnDestroy {
     ) {
       this.validationErrors['accountNumber'] = 'Số tài khoản là bắt buộc';
       isValid = false;
+      console.log('account num 0', isValid);
     } else if (this.eventData.bankInfo.accountNumber.length < 8) {
       this.validationErrors['accountNumber'] =
         'Số tài khoản phải có ít nhất 8 số';
       isValid = false;
+      console.log('account num1', isValid);
     } else if (!/^\d+$/.test(this.eventData.bankInfo.accountNumber)) {
       this.validationErrors['accountNumber'] = 'Số tài khoản chỉ được chứa số';
       isValid = false;
+      console.log('account number 2', isValid);
     }
 
     // Validate bank name
@@ -314,6 +321,7 @@ export class Step4PaymentComponent implements OnInit, OnDestroy {
       this.validationErrors['bankName'] =
         'Vui lòng chọn ngân hàng từ danh sách';
       isValid = false;
+      console.log('ngan hang', isValid);
     }
 
     // Bank branch is optional but validate if provided
@@ -325,10 +333,12 @@ export class Step4PaymentComponent implements OnInit, OnDestroy {
         this.validationErrors['bankBranch'] =
           'Chi nhánh phải có ít nhất 3 ký tự';
         isValid = false;
+        console.log('chi nhanh', isValid);
       }
     }
     this.isStepValid = isValid;
     if (fromNext) this.stepComplete.emit(isValid);
+    console.log("step4", isValid)
     return isValid;
   }
 

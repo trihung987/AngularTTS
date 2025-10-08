@@ -1,0 +1,489 @@
+/* Existing CSS from events.css */
+:host {
+  --main-color: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  --price-color: greenyellow;
+}
+
+.page-container {
+  font-family: 'Inter', sans-serif;
+  background: black;
+  color: #fff;
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.canvas-container {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+canvas {
+  background: black;
+  cursor: grab;
+  width: 100%;
+  height: 100%;
+}
+
+canvas:active {
+  cursor: grabbing;
+}
+
+.zoom-controls {
+  position: absolute;
+  top: 30px;
+  left: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 10;
+}
+
+.zoom-btn {
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.zoom-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.sidebar {
+  width: 380px;
+  background: #2d2d2d;
+  border-left: 1px solid #444;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+.event-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.back-btn {
+  display: flex;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.event-title {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.event-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #ccc;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.price-section {
+  margin-top: 30px;
+}
+
+.price-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.price-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  margin: 12px 0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.price-item:hover,
+.price-item.selected {
+  background: rgba(78, 205, 196, 0.2);
+  border-color: #4ecdc4;
+}
+
+.price-item.sold-out {
+  background: rgba(85, 85, 85, 0.5);
+  border-color: #888;
+  cursor: not-allowed;
+  color: #aaa;
+}
+
+.price-item.sold-out:hover {
+  background: rgba(85, 85, 85, 0.5);
+  border-color: #888;
+}
+
+.price-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.price-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+
+.price-name {
+  font-weight: 600;
+}
+
+.price-amount {
+  font-weight: 700;
+  color: var(--price-color);
+}
+
+.price-amount.sold-out-text {
+  color: #ff5555;
+  font-weight: bold;
+}
+
+.selected-zone-info {
+  margin-top: 20px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.selected-zone-info h4 {
+  margin-bottom: 10px;
+  color: #4ecdc4;
+}
+
+.selected-zone-info p {
+  margin: 8px 0;
+  color: #ccc;
+}
+
+.loading-overlay,
+.error-message {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: white;
+}
+
+/* Dialog Styles - Updated with solid background */
+:host ::ng-deep .zone-dialog {
+  background: rgba(0, 0, 0, 0.8) !important;
+}
+
+:host ::ng-deep .zone-dialog .p-dialog {
+  background: #1a1a1a !important;
+  border: 1px solid #333 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8) !important;
+  animation: dialogFadeIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+:host ::ng-deep .zone-dialog .p-dialog-content {
+  padding: 0 !important;
+  background: #1a1a1a !important;
+}
+
+@keyframes dialogFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes dialogFadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+}
+
+.dialog-content {
+  padding: 30px;
+  color: #fff;
+  background: #1a1a1a;
+  border-radius: 16px;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.zone-color-indicator {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+.zone-info {
+  flex: 1;
+}
+
+.zone-name {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.zone-description {
+  margin: 0;
+  color: #ccc;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.zone-details {
+  margin-bottom: 24px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: #aaa;
+}
+
+.detail-value {
+  font-weight: 600;
+  color: #fff;
+}
+
+.detail-value.price {
+  color: var(--price-color);
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.quantity-section {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.quantity-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #fff;
+}
+
+.quantity-controls {
+  display: flex;
+  justify-content: center;
+}
+
+:host ::ng-deep .quantity-controls .p-inputnumber {
+  width: 250px;
+}
+
+:host ::ng-deep .quantity-controls .p-inputnumber-input {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+  text-align: center !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
+}
+
+:host ::ng-deep .quantity-controls .p-inputnumber-input:focus {
+  border-color: #4ecdc4 !important;
+  box-shadow: 0 0 0 2px rgba(78, 205, 196, 0.2) !important;
+}
+
+:host ::ng-deep .quantity-controls .p-inputnumber-button {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+  width: 40px !important;
+  height: 40px !important;
+}
+
+:host ::ng-deep .quantity-controls .p-inputnumber-button:hover {
+  background: rgba(78, 205, 196, 0.2) !important;
+  border-color: #4ecdc4 !important;
+}
+
+:host ::ng-deep .quantity-controls .p-inputnumber-button:active {
+  background: rgba(78, 205, 196, 0.3) !important;
+}
+
+.total-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: rgba(78, 205, 196, 0.1);
+  border: 1px solid rgba(78, 205, 196, 0.3);
+  border-radius: 12px;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.total-label {
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.total-amount {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--price-color);
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+:host ::ng-deep .dialog-btn-cancel {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #aaa !important;
+  padding: 12px 24px !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+}
+
+:host ::ng-deep .dialog-btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+  color: #fff !important;
+}
+
+:host ::ng-deep .dialog-btn-confirm {
+  background: var(--main-color) !important;
+  border: none !important;
+  color: #fff !important;
+  padding: 12px 32px !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+  font-size: 15px !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4) !important;
+}
+
+:host ::ng-deep .dialog-btn-confirm:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6) !important;
+}
+
+:host ::ng-deep .dialog-btn-confirm:active {
+  transform: translateY(0) !important;
+}
+
+:host ::ng-deep .p-dialog-mask.p-component-overlay {
+  background: rgba(0, 0, 0, 0.7) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
+  backdrop-filter: blur(5px) !important;
+}
+
+:host ::ng-deep .p-dialog-enter-active {
+  animation: dialogEnter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+:host ::ng-deep .p-dialog-leave-active {
+  animation: dialogLeave 0.3s ease-out !important;
+}
+
+@keyframes dialogEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.85) translateY(-30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes dialogLeave {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0.85) translateY(-30px);
+  }
+}

@@ -20,10 +20,12 @@ export class AuthGuard implements CanActivate {
     if (isPlatformServer(this.platformId)) {
       return true;
     }
+    console.log('URL guard' + this.router.url);
     // Client-side check
     if (isPlatformBrowser(this.platformId)) {
       if (this.authService.isLogin()) {
         console.log('Đã login từ guard');
+        console.log('URL guard' + this.router.url);
         return true;
       }
 

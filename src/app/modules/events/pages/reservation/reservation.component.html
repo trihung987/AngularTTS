@@ -1,0 +1,108 @@
+<div class="page">
+  <header class="header">
+    <div class="brand">
+      <button class="back-btn" (click)="goBack()" aria-label="Quay lại">
+        ←
+      </button>
+      <div class="logo" aria-hidden="true"></div>
+      <h1>Thanh toán vé</h1>
+    </div>
+    <div class="status" [class.expired]="isExpired()">
+      {{ statusText() }}
+    </div>
+  </header>
+
+  <ng-container *ngIf="reservation() as res; else loading">
+    <section class="grid">
+      <article class="card">
+        <div class="section-title">Thông tin đơn hàng</div>
+        <div class="info">
+          <div class="label">Sự kiện</div>
+          <div class="value">{{ res.nameEvent }}</div>
+
+          <div class="label">Khu / Zone</div>
+          <div class="value">{{ res.nameZone }}</div>
+
+          <div class="label">Số lượng vé</div>
+          <div class="value">{{ res.quantity }}</div>
+
+          <div class="label">Giá / vé</div>
+          <div class="value">
+            {{ formatCurrency(res.priceZone) }}
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="section-title">Thời gian giữ chỗ</div>
+        <div class="countdown">
+          <div class="cd-line">
+            <span class="cd-label">Còn lại</span>
+            <span class="cd-chip">{{ timeLeft() }}</span>
+          </div>
+          <div class="cd-bar" aria-hidden="true">
+            <span [style.transform]="'scaleX(' + timeProgress() + ')'"></span>
+          </div>
+          <div class="cd-warning" [class.show]="isExpired()">
+            Vé đã hết hạn giữ chỗ. Vui lòng đặt lại.
+          </div>
+        </div>
+
+        <div class="meta">
+          <span class="pill">
+            Mã đặt chỗ: <strong>{{ res.id }}</strong>
+          </span>
+          <span class="pill">
+            Tạo lúc:
+            <strong>{{
+              res.createdAt | date : "HH:mm, dd/MM/yyyy"
+            }}</strong>
+          </span>
+          <span class="pill">
+            Hết hạn:
+            <strong>{{
+              res.expiresAt | date : "HH:mm, dd/MM/yyyy"
+            }}</strong>
+          </span>
+        </div>
+      </article>
+
+      <aside class="card pay-card">
+        <div class="price-summary">
+            <div class="section-title">Thanh toán</div>
+            <div class="price-row muted">
+              <div class="left">Tạm tính</div>
+              <div class="right">
+                {{ formatCurrency(subtotal())}}
+              </div>
+            </div>
+            <div class="price-row muted">
+              <div class="left">Phí (0₫)</div>
+              <div class="right">0 ₫</div>
+            </div>
+            <div class="divider"></div>
+            <div class="price-row total">
+              <div class="left">Tổng cộng</div>
+              <div class="right">
+                {{ formatCurrency(subtotal())}}
+              </div>
+            </div>
+        </div>
+
+        <div>
+            <button class="btn" [disabled]="isExpired()" (click)="confirmPayment()">
+              Thanh toán ngay
+            </button>
+            <div class="hint">
+              Bạn cần thanh toán trước khi thời gian giữ chỗ về 0.
+            </div>
+        </div>
+      </aside>
+    </section>
+  </ng-container>
+
+  <ng-template #loading>
+    <div class="card">Đang tải thông tin giữ chỗ...</div>
+  </ng-template>
+  <p-confirmdialog />
+</div>

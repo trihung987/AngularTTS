@@ -12,6 +12,7 @@ import {
   EventEmitter,
   OnInit,
   HostListener,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -21,15 +22,26 @@ import {
 } from '../../../services/events.service';
 import { Subject, takeUntil } from 'rxjs';
 import { Zone } from '../../../../../shared/models/zone.model';
-
-
+import { animate, style, transition, trigger } from '@angular/animations';
+import { RequiredComponent } from "../../../../../shared/components/required/required.component";
 
 @Component({
   selector: 'step3-zone',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RequiredComponent],
   templateUrl: './step3-zone.component.html',
   styleUrls: ['./step3-zone.component.css'],
+  animations: [
+    trigger('fadeInUp', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(30px)' }),
+        animate(
+          '400ms cubic-bezier(0.4, 0, 0.2, 1)',
+          style({ opacity: 1, transform: 'translateY(0)' })
+        ),
+      ]),
+    ]),
+  ],
 })
 export class Step3ZoneComponent implements AfterViewInit, OnDestroy, OnInit {
   @ViewChild('canvas', { static: true })
@@ -136,7 +148,8 @@ export class Step3ZoneComponent implements AfterViewInit, OnDestroy, OnInit {
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private ngZone: NgZone,
-    private createEventService: CreateEventService
+    private createEventService: CreateEventService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -168,7 +181,7 @@ export class Step3ZoneComponent implements AfterViewInit, OnDestroy, OnInit {
     // ### END: Cleanup Pan/Zoom Listener ###
   }
 
-  private loadExistingLayoutData() {
+  public loadExistingLayoutData() {
     const currentData = this.createEventService.getCurrentEventData();
     if (currentData.zones && currentData.zones.length > 0) {
       this.zones = [...currentData.zones];
@@ -198,6 +211,7 @@ export class Step3ZoneComponent implements AfterViewInit, OnDestroy, OnInit {
         isSellable: zone.isSellable ?? true,
         coordinates: zone.coordinates,
         maxTickets: zone.maxTickets || 0,
+        soldTickets: 0,
         isSeatingZone: zone.isSeatingZone ?? true,
         description: zone.description || '',
         rotation: zone.rotation, // Save rotation
@@ -210,7 +224,7 @@ export class Step3ZoneComponent implements AfterViewInit, OnDestroy, OnInit {
 
   public validateAndEmitStepComplete(fromNext: boolean = true) {
     this.saveLayoutData();
-    console.log("step 3")
+    console.log('step 3');
     const hasValidLayout = this.zones.length > 0;
     const hasSellableZones = this.zones.some((z) => z.isSellable ?? true);
     const hasCapacity = this.zones
@@ -224,7 +238,7 @@ export class Step3ZoneComponent implements AfterViewInit, OnDestroy, OnInit {
       !hasSellableZones || hasCapacity,
       ' - ',
       hasSellableZones,
-      " - ",
+      ' - ',
       hasCapacity
     );
     if (fromNext) this.stepComplete.emit(isValid);
@@ -358,7 +372,7 @@ export class Step3ZoneComponent implements AfterViewInit, OnDestroy, OnInit {
     if (!this.newZone.name || !this.newZone.color) return;
 
     const zone: Zone = {
-      id: this.nextZoneId++,
+      id: this.zones.length + 1,
       name: this.newZone.name,
       color: this.newZone.color,
       price: this.newZone.isSellable ? this.newZone.price : 0,
@@ -374,8 +388,7 @@ export class Step3ZoneComponent implements AfterViewInit, OnDestroy, OnInit {
         : undefined,
       rotation: 0, // <-- NEW: Initialize rotation
     };
-
-    this.zones.push(zone);
+    this.zones = [...this.zones, zone];
     this.newZone = {
       name: '',
       color: '#ff6b6b',
@@ -428,7 +441,9 @@ export class Step3ZoneComponent implements AfterViewInit, OnDestroy, OnInit {
 
   selectZone(zone: Zone) {
     this.selectedZone = zone;
+
     this.updateCursor();
+    this.cdr.detectChanges();
   }
 
   editZone(zone: Zone) {
@@ -438,30 +453,38 @@ export class Step3ZoneComponent implements AfterViewInit, OnDestroy, OnInit {
   saveEdit() {
     if (!this.editingZone) return;
 
-    const index = this.zones.findIndex((z) => z.id === this.editingZone!.id);
-    if (index !== -1) {
-      const originalZone = this.zones[index];
+    const newZones = this.zones.map((zone) => {
+      if (zone.id === this.editingZone!.id) {
+        const originalZone = zone;
+        let updatedZone = { ...originalZone, ...this.editingZone };
 
-      if (originalZone.shape !== this.editingZone.shape) {
-        const boundingBox = this.getZoneBoundingBox(originalZone);
-        this.editingZone.coordinates = this.convertCoordinatesForShapeChange(
-          this.editingZone.shape,
-          boundingBox
-        );
+        if (originalZone.shape !== updatedZone.shape) {
+          const boundingBox = this.getZoneBoundingBox(originalZone);
+          updatedZone.coordinates = this.convertCoordinatesForShapeChange(
+            updatedZone.shape,
+            boundingBox
+          );
+        }
+
+        if (!updatedZone.isSellable) {
+          updatedZone.price = 0;
+          updatedZone.maxTickets = undefined;
+          updatedZone.isSeatingZone = undefined;
+          updatedZone.description = undefined;
+        }
+
+        return updatedZone;
       }
+      return zone;
+    });
 
-      if (!this.editingZone.isSellable) {
-        this.editingZone.price = 0;
-        this.editingZone.maxTickets = undefined;
-        this.editingZone.isSeatingZone = undefined;
-        this.editingZone.description = undefined;
-      }
+    this.zones = newZones;
 
-      this.zones[index] = { ...this.editingZone };
-      this.selectedZone = this.zones[index];
-      this.drawCanvas();
-      this.saveLayoutData();
-    }
+    this.selectedZone =
+      this.zones.find((z) => z.id === this.editingZone!.id) || null;
+
+    this.drawCanvas();
+    this.saveLayoutData();
     this.editingZone = null;
   }
 
@@ -571,10 +594,11 @@ export class Step3ZoneComponent implements AfterViewInit, OnDestroy, OnInit {
   }
 
   confirmClear() {
-    this.zones.forEach((zone) => {
-      zone.coordinates = this.getDefaultCoordinatesForShape(zone.shape);
-      zone.rotation = 0; // Reset rotation
-    });
+    // this.zones.forEach((zone) => {
+    //   zone.coordinates = this.getDefaultCoordinatesForShape(zone.shape);
+    //   zone.rotation = 0; // Reset rotation
+    // });
+    this.zones = [];
     this.selectedZone = null;
     this.drawCanvas();
     this.saveLayoutData();
@@ -1078,13 +1102,22 @@ export class Step3ZoneComponent implements AfterViewInit, OnDestroy, OnInit {
     this.ctx.textBaseline = 'middle'; // For vertical centering
 
     const isSellable = zone.isSellable ?? true;
-    const labelText = isSellable ? `${zone.name} - $${zone.price}` : zone.name;
+    const labelText = isSellable
+      ? `${zone.name} - ${this.formatCurrency(zone.price)}`
+      : zone.name;
 
     // Vì canvas đã được dịch chuyển về tâm và xoay,
     // vẽ chữ tại (0, 0) sẽ đặt nó ngay giữa shape.
     this.ctx.fillText(labelText, 0, 0);
 
     this.ctx.restore();
+  }
+
+  formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+    }).format(amount);
   }
 
   private highlightSelectedZone(zone: Zone) {

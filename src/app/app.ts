@@ -12,9 +12,18 @@ import { filter, first } from 'rxjs';
   styleUrl: './app.css',
   encapsulation: ViewEncapsulation.None,
 })
-export class App{
+export class App {
   isBrowser = false;
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
-    this.isBrowser = isPlatformBrowser(this.platformId);
+  isProtectedRoute = false;
+
+  constructor(@Inject(PLATFORM_ID) platformId: Object, private router: Router) {
+    this.isBrowser = isPlatformBrowser(platformId);
+
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe(() => {
+        const currentUrl = this.router.url;
+        this.isProtectedRoute = currentUrl.startsWith('/admin'); // hoặc list route
+      });
   }
 }

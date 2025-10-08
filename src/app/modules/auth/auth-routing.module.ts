@@ -5,6 +5,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { AuthLayoutComponent } from './components/auth-layout/auth-layout.component';
 import { LoginComponent } from './pages/login/login.component';
 import { RegisterComponent } from './pages/register/register.component';
+import { AuthGuard } from '../../core/guard/auth.guard';
+import { AuthRedirectGuard } from '../../core/guard/auth-redirect.guard';
 
 const routes: Routes = [
   {
@@ -14,6 +16,7 @@ const routes: Routes = [
       {
         path: 'login', // URL đầy đủ sẽ là /auth/login
         component: LoginComponent,
+        canActivate: [AuthRedirectGuard], // Có thể thêm guard nếu cần
       },
       {
         path: 'register', // URL đầy đủ sẽ là /auth/register

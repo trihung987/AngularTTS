@@ -1,0 +1,77 @@
+<div class="page-container">
+  <div class="container">
+    <div class="profile-layout">
+      <aside class="sidebar">
+        <ng-container *ngIf="user$ | async as user">
+          <div class="sidebar-user">
+            <img
+              *ngIf="user.avatarUrl"
+              [src]="user.avatarUrl"
+              alt="user.fullName"
+            />
+            <div *ngIf="!user.avatarUrl" class="profile-initials">
+              <span>{{ getInitials(user.fullName) }}</span>
+            </div>
+
+            <div class="user-info">
+              <span>Tài khoản của</span>
+              <strong>{{ user.fullName }}</strong>
+            </div>
+          </div>
+        </ng-container>
+
+        <nav class="sidebar-nav">
+          <ul>
+            <li *ngFor="let item of sidebarItems">
+              <a [routerLink]="item.route" routerLinkActive="active">
+                <!-- Icon người -->
+                <svg
+                  *ngIf="item.icon === 'user-detail'"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+
+                <!-- Icon vé -->
+                <svg
+                  *ngIf="item.icon === 'ticket'"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M3 9V5a2 2 0 0 1 2-2h4"></path>
+                  <path d="M21 15v4a2 2 0 0 1-2 2h-4"></path>
+                  <path d="M3 15a2 2 0 0 0 0-4"></path>
+                  <path d="M21 9a2 2 0 0 0 0 4"></path>
+                  <path d="M13 5h6a2 2 0 0 1 2 2v2"></path>
+                  <path d="M11 19H5a2 2 0 0 1-2-2v-2"></path>
+                </svg>
+
+                <span>{{ item.label }}</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+
+      <main class="main-content">
+        <router-outlet></router-outlet>
+      </main>
+    </div>
+  </div>
+</div>

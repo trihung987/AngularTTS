@@ -11,7 +11,7 @@
     <section class="form-section">
       <h3 class="section-title">Thông tin cơ bản</h3>
       <div class="form-group full-width">
-        <label for="eventName" class="form-label">Tên sự kiện</label>
+        <label for="eventName" class="form-label"><line-required label="Tên sự kiện"/></label>
         <input
           type="text"
           id="eventName"
@@ -30,8 +30,9 @@
       </div>
 
       <div class="form-group full-width">
-        <label for="eventCategory" class="form-label">Thể loại sự kiện</label>
+        <label for="eventCategory" class="form-label"> <line-required label="Thể loại sự kiện"/></label>
         <select
+          aria-label="Event Category"
           id="eventCategory"
           name="eventCategory"
           class="form-select"
@@ -56,7 +57,7 @@
       <div class="image-uploads">
         <div class="image-upload-group avatar-group">
           <div class="upload-label">
-            <span class="label-text">Ảnh đại diện (1:1)</span>
+            <span class="label-text"><line-required label="Ảnh đại diện (1:1)"/></span>
             <span class="label-hint">Tối đa 5MB</span>
           </div>
           <input
@@ -101,7 +102,7 @@
 
         <div class="image-upload-group banner-group">
           <div class="upload-label">
-            <span class="label-text">Ảnh bìa (16:9)</span>
+            <span class="label-text"><line-required label="Ảnh bìa (16:9)"/></span>
             <span class="label-hint">Tối đa 5MB</span>
           </div>
           <input
@@ -149,7 +150,7 @@
       <div class="organizer-grid">
         <div class="image-upload-group logo-group">
           <div class="upload-label">
-            <span class="label-text">Logo ban tổ chức (7:4) </span>
+            <span class="label-text"><line-required label="Logo ban tổ chức (7:4)"/></span>
             <span class="label-hint">Tối đa 5MB</span>
           </div>
           <input
@@ -188,7 +189,7 @@
 
         <div class="organizer-details">
           <div class="form-group">
-            <label for="organizerName" class="form-label">Tên ban tổ chức</label>
+            <label for="organizerName" class="form-label"><line-required label="Tên ban tổ chức"/></label>
             <input
               type="text"
               id="organizerName"
@@ -205,7 +206,7 @@
             </div>
           </div>
           <div class="form-group">
-            <label for="organizerBio" class="form-label">Giới thiệu gọn</label>
+            <label for="organizerBio" class="form-label"><line-required label="Giới thiệu gọn"/></label>
             <textarea
               id="organizerBio"
               name="organizerBio"
@@ -229,7 +230,7 @@
       <h3 class="section-title">Mô tả chi tiết</h3>
       <div class="form-group full-width editor-container">
         <label for="eventDescription" class="form-label">
-          <span>Nội dung mô tả</span>
+          <span><line-required label="Nội dung mô tả"/></span>
           <span class="char-count">
             {{ getCharacterCount(eventData.eventDescription || '') }} ký tự
           </span>
@@ -256,8 +257,9 @@
       <h3 class="section-title">Địa điểm tổ chức</h3>
       <div class="form-grid">
         <div class="form-group">
-          <label for="province" class="form-label">Tỉnh/Thành phố</label>
+          <label for="province" class="form-label"><line-required label="Tỉnh/Thành phố"/></label>
           <select
+            aria-label="Province"
             id="province"
             name="province"
             class="form-select"
@@ -277,7 +279,7 @@
         </div>
 
         <div class="form-group full-width">
-          <label for="address" class="form-label">Địa chỉ chi tiết</label>
+          <label for="address" class="form-label"><line-required label="Địa chỉ chi tiết"/></label>
           <input
             type="text"
             id="address"

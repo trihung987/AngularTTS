@@ -1,0 +1,148 @@
+<div class="page-container">
+  <div *ngIf="isLoading()" class="loading-overlay">Đang tải sơ đồ...</div>
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+
+  <ng-container *ngIf="event">
+    <div class="canvas-container">
+      <canvas #canvas></canvas>
+      <div class="zoom-controls">
+        <button class="zoom-btn" (click)="zoom(1.2)">+</button>
+        <button class="zoom-btn" (click)="resetView()">⟲</button>
+        <button class="zoom-btn" (click)="zoom(0.8)">-</button>
+      </div>
+    </div>
+
+    <div class="sidebar">
+      <div class="event-header">
+        <button class="back-btn" (click)="goBack()">← Quay lại</button>
+        <div class="event-title">{{ event.eventName }}</div>
+        <div class="event-info">
+          <div class="info-row">
+            <span class="icon">🕰️</span>
+            <span
+              >{{ event.startTime }},
+              {{ event.startDate | date : "dd/MM/yyyy" }}</span
+            >
+          </div>
+          <div class="info-row">
+            <span class="icon">📍</span>
+            <span>{{ event.venue.address }}, {{ event.venue.province }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="price-section">
+        <h3 class="price-title">Bảng Giá Vé</h3>
+        <div
+          *ngFor="let zone of getSellableZones()"
+          class="price-item"
+          [class.selected]="selectedZone?.id === zone.id"
+          [class.sold-out]="isZoneSoldOut(zone)"
+          (click)="selectAndHighlightZone(zone)"
+        >
+          <div class="price-left">
+            <span class="price-color" [style.background]="zone.color"></span>
+            <span class="price-name">{{ zone.name }}</span>
+          </div>
+          <span class="price-amount" *ngIf="!isZoneSoldOut(zone)">{{
+            formatCurrency(zone.price)
+          }}</span>
+          <span class="price-amount sold-out-text" *ngIf="isZoneSoldOut(zone)"
+            >Hết vé</span
+          >
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <p-dialog
+    [visible]="showDialog()"
+    (onHide)="onDialogHide()"
+    [modal]="true"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="false"
+    styleClass="zone-dialog"
+    [showHeader]="false"
+    [style]="{ width: '450px', maxWidth: '90vw' }"
+  >
+    <div class="dialog-content" *ngIf="selectedZone">
+      <div class="dialog-header">
+        <div
+          class="zone-color-indicator"
+          [style.background]="selectedZone.color"
+        ></div>
+        <div class="zone-info">
+          <h2 class="zone-name">{{ selectedZone.name }}</h2>
+          <p class="zone-description">{{ selectedZone.description }}</p>
+        </div>
+      </div>
+
+      <div class="zone-details">
+        <div class="detail-row">
+          <span class="detail-label">Giá vé:</span>
+          <span class="detail-value price">{{
+            formatCurrency(selectedZone.price)
+          }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Sức chứa:</span>
+          <span class="detail-value"
+            >{{ selectedZone.maxTickets | number }} chỗ</span
+          >
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Loại ghế:</span>
+          <span class="detail-value">{{
+            selectedZone.isSeatingZone ? "Ghế ngồi" : "Khu vực đứng"
+          }}</span>
+        </div>
+      </div>
+
+      <div class="quantity-section">
+        <label class="quantity-label">Số lượng vé:</label>
+        <div class="quantity-controls">
+          <p-inputNumber
+            [(ngModel)]="ticketQuantity"
+            [min]="1"
+            [max]="(selectedZone.maxTickets ?? 0) - (selectedZone.soldTickets ?? 0)"
+            [showButtons]="true"
+            buttonLayout="horizontal"
+            spinnerMode="horizontal"
+            [step]="1"
+            decrementButtonClass="quantity-btn-minus"
+            incrementButtonClass="quantity-btn-plus"
+            inputStyleClass="quantity-input"
+          >
+          </p-inputNumber>
+        </div>
+      </div>
+
+      <div class="total-section">
+        <div class="total-row">
+          <span class="total-label">Tổng tiền:</span>
+          <span class="total-amount">{{
+            formatCurrency(getTotalPrice())
+          }}</span>
+        </div>
+      </div>
+
+      <div class="dialog-actions">
+        <p-button
+          label="Hủy"
+          icon="pi pi-times"
+          (onClick)="onDialogHide()"
+          styleClass="p-button-text dialog-btn-cancel"
+        >
+        </p-button>
+        <p-button
+          label="Xác nhận mua vé"
+          icon="pi pi-check"
+          (onClick)="confirmPurchase()"
+          styleClass="dialog-btn-confirm"
+        >
+        </p-button>
+      </div>
+    </div>
+  </p-dialog>
+</div>

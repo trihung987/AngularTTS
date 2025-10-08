@@ -1,0 +1,213 @@
+/* ===== QR Scanner Dialog Styles ===== */
+
+/* Dialog Header Styling */
+.dialog-header-content {
+  display: flex;
+  align-items: center;
+  color: #667eea;
+}
+
+.scanner-content {
+  padding: 1rem 0;
+}
+
+/* Scanner Container */
+.scanner-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.scanner-container zxing-scanner {
+  width: 100%;
+  height: 100%;
+}
+
+/* Scan Guide Overlay */
+.scan-guide {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  text-align: center;
+}
+
+.scan-frame {
+  width: 250px;
+  height: 250px;
+  border: 3px solid #667eea;
+  border-radius: 12px;
+  position: relative;
+  animation: pulse 2s infinite;
+  box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
+  }
+
+  50% {
+    box-shadow: 0 0 0 20px rgba(102, 126, 234, 0);
+  }
+}
+
+.scan-frame::before,
+.scan-frame::after {
+  content: '';
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border: 4px solid #667eea;
+}
+
+.scan-frame::before {
+  top: -4px;
+  left: -4px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.scan-frame::after {
+  bottom: -4px;
+  right: -4px;
+  border-left: none;
+  border-top: none;
+}
+
+.scan-instruction {
+  color: white;
+  margin-top: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 8px 16px;
+  border-radius: 20px;
+  display: inline-block;
+}
+
+/* Camera Controls */
+.camera-controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+/* PrimeNG Dialog Overrides */
+.p-dialog.qr-scanner-dialog {
+  width: 90vw;
+  max-width: 600px;
+}
+
+.p-dialog .p-dialog-header {
+  padding: 1.25rem;
+}
+
+.p-dialog .p-dialog-content {
+  padding: 0 1.25rem;
+}
+
+.p-dialog .p-dialog-footer {
+  padding: 1.25rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* Button Overrides */
+.camera-controls .p-button {
+  font-size: 14px;
+}
+
+.camera-controls .p-button .p-button-icon {
+  font-size: 1rem;
+}
+
+.camera-controls .p-button .p-button-label {
+  margin-left: 0.5rem;
+}
+
+/* Message Component Overrides */
+.scanner-content .p-message {
+  width: 100%;
+}
+
+.scanner-container+.p-message {
+  margin-top: 2rem;
+}
+
+.scanner-content .p-message:not(:first-child) {
+  margin-top: 1rem;
+}
+
+.p-message .p-message-wrapper {
+  padding: 1rem;
+}
+
+.p-message .p-message-icon {
+  font-size: 1.25rem;
+}
+
+.p-message .p-message-text {
+  font-size: 14px;
+}
+
+/* Footer Button Overrides */
+.p-dialog-footer .p-button {
+  min-width: 100px;
+}
+
+.p-dialog-footer .p-button.p-button-outlined {
+  border-color: #6c757d;
+  color: #6c757d;
+}
+
+.p-dialog-footer .p-button.p-button-outlined:hover {
+  background: rgba(108, 117, 125, 0.04);
+  border-color: #6c757d;
+  color: #6c757d;
+}
+
+/* Dialog Header Icon */
+.dialog-header-content .pi-qrcode {
+  color: #667eea;
+  font-size: 1.5rem;
+  margin-right: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .scan-frame {
+    width: 200px;
+    height: 200px;
+  }
+
+  .p-dialog.qr-scanner-dialog {
+    width: 95vw !important;
+    max-width: none !important;
+  }
+
+  .camera-controls .p-button .p-button-label {
+    font-size: 13px;
+  }
+
+  .p-dialog .p-dialog-header {
+    padding: 1rem;
+  }
+
+  .p-dialog .p-dialog-content {
+    padding: 0 1rem;
+  }
+
+  .p-dialog .p-dialog-footer {
+    padding: 1rem;
+  }
+}

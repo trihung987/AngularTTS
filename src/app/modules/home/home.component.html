@@ -1,17 +1,94 @@
+<section class="auto-banner" *ngIf="bannerEvents().length>0">
+  <div class="banner-container">
+    <div class="banner-content" *ngIf="!isBannerLoading()">
+      <div
+        class="banner-slide"
+        *ngFor="let event of bannerEvents(); let i = index"
+        [class.active]="i === currentBannerIndex"
+        (click)="onBannerClick(event)"
+      >
+        <div class="banner-image">
+          <img
+            [src]="getImageUrl(event.eventBanner || event.eventImage)"
+            alt="event.eventName"
+            class="banner-img"
+          />
+          <div class="banner-overlay"></div>
+        </div>
+        <div class="banner-text">
+          <div class="banner-category">{{ event.eventCategory }}</div>
+          <h2 class="banner-title">{{ event.eventName }}</h2>
+          <div class="banner-details">
+            <span class="banner-date">{{ formatDate(event.startDate) }}</span>
+            <span class="banner-location">{{ event.venue.province }}</span>
+          </div>
+          <button
+            class="banner-cta"
+            (click)="$event.stopPropagation(); onBookEvent(event)"
+          >
+            Đặt vé ngay
+          </button>
+        </div>
+      </div>
+    </div>
 
-<!-- Hero Section -->
+    <div class="banner-controls" *ngIf="bannerEvents">
+      <button
+        aria-label="banner prev"
+        class="banner-nav prev"
+        (click)="prevBanner()"
+      >
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 19l-7-7 7-7"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="banner next"
+        class="banner-nav next"
+        (click)="nextBanner()"
+      >
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 5l7 7-7 7"
+          />
+        </svg>
+      </button>
+      <div class="banner-indicators">
+        <button
+          aria-label="banner"
+          *ngFor="let event of bannerEvents(); let i = index"
+          class="banner-indicator"
+          [class.active]="i === currentBannerIndex"
+          (click)="setBannerIndex(i)"
+        ></button>
+      </div>
+    </div>
+
+    <div class="banner-loading" *ngIf="isBannerLoading()">
+      <p-skeleton height="100%" width="100%"></p-skeleton>
+    </div>
+  </div>
+</section>
+
 <section class="hero">
   <div class="container">
     <div class="hero-content">
       <h1 class="hero-title">
-        Khám phá sự kiện <span class="highlight">tuyệt vời</span>
+        Khám phá những sự kiện <span class="highlight">tuyệt vời</span>
       </h1>
       <p class="hero-description">
         Nền tảng đặt vé sự kiện hàng đầu Việt Nam. Tìm kiếm, đặt vé và tham gia
         những sự kiện đỉnh cao với trải nghiệm seamless từ A-Z.
       </p>
 
-      <!-- Search Bar -->
       <div class="search-container">
         <div class="search-box">
           <div class="search-input-container">
@@ -32,16 +109,17 @@
               type="text"
               placeholder="Tìm kiếm sự kiện, địa điểm, chủ đề..."
               class="search-input"
+              [(ngModel)]="searchQuery"
+              (keypress)="onEnterSearch($event)"
             />
           </div>
-          <button class="search-btn">Tìm kiếm</button>
+          <button class="search-btn" (click)="onSearch()">Tìm kiếm</button>
         </div>
       </div>
 
-      <!-- Quick Stats -->
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-number blue">1000+</div>
+          <div class="stat-number blue">{{ featuredEvents.length }}+</div>
           <div class="stat-label">Sự kiện hoạt động</div>
         </div>
         <div class="stat-card">
@@ -57,31 +135,144 @@
   </div>
 </section>
 
-<!-- Featured Events -->
+<section class="large-capacity-events" *ngIf="largeCapacityEvents.length > 0">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Sự kiện quy mô lớn</h2>
+      <p class="section-description">
+        Những sự kiện với sức chứa khủng không thể bỏ lỡ
+      </p>
+    </div>
+
+    <p-carousel
+      [value]="largeCapacityEvents"
+      [numVisible]="carouselNumVisible()"
+      [numScroll]="1"
+      [responsiveOptions]="carouselResponsiveOptions"
+      [showIndicators]="true"
+      [showNavigators]="true"
+      [autoplayInterval]="4000"
+      [circular]="true"
+      class="custom-carousel"
+    >
+      <ng-template pTemplate="item" let-event>
+        <div class="carousel-event-card" (click)="onBookEvent(event)">
+          <div class="carousel-event-image">
+            <img
+              [src]="getImageUrl(event.eventImage)"
+              alt="event.eventName"
+              class="carousel-img"
+            />
+            <div class="carousel-event-category">{{ event.eventCategory }}</div>
+            <div class="capacity-badge">
+              <svg
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                class="capacity-icon"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                />
+              </svg>
+              {{ getTotalSeats(event) }} chỗ
+            </div>
+          </div>
+          <div class="carousel-event-details">
+            <h3 class="carousel-event-title">{{ event.eventName }}</h3>
+            <div class="carousel-event-info">
+              <div class="info-item">
+                <svg
+                  class="info-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+                <span>{{ formatDate(event.startDate) }}</span>
+              </div>
+              <div class="info-item">
+                <svg
+                  class="info-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                <span>{{ event.venue?.province }}</span>
+              </div>
+            </div>
+            <div class="carousel-event-footer">
+              <div class="event-capacity">
+                Quy mô {{ getTotalSeats(event) }} người
+              </div>
+              <button class="btn-book" (click)="onBookEvent(event)">
+                Đặt vé
+              </button>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </p-carousel>
+  </div>
+</section>
+
 <section class="featured-events">
   <div class="container">
     <div class="section-header">
-      <h2 class="section-title">Sự kiện nổi bật</h2>
-      <p class="section-description">Những sự kiện hot nhất không thể bỏ lỡ</p>
+      <h2 class="section-title">Sự kiện sắp diễn ra</h2>
+      <p class="section-description">Những sự kiện hot không thể bỏ lỡ</p>
     </div>
 
-    <div class="events-grid">
-      @for (event of featuredEvents; track event.id) {
-      <div class="event-card">
+    <div class="events-grid" *ngIf="isLoading()">
+      <div class="event-card" *ngFor="let item of [1, 2, 3, 4, 5, 6]">
+        <p-skeleton height="250px" width="100%"></p-skeleton>
+        <div style="padding: 24px">
+          <p-skeleton height="24px" width="80%" class="mb-2"></p-skeleton>
+          <p-skeleton height="16px" width="60%" class="mb-2"></p-skeleton>
+          <p-skeleton height="16px" width="70%" class="mb-2"></p-skeleton>
+          <p-skeleton height="40px" width="100%"></p-skeleton>
+        </div>
+      </div>
+    </div>
+
+    <div class="events-grid" *ngIf="!isLoading() && featuredEvents.length > 0">
+      <div
+        class="event-card"
+        *ngFor="let event of featuredEvents; trackBy: trackByEventId"
+        (click)="onBookEvent(event)"
+      >
         <div class="event-image">
-          <img [ngSrc]="event.image" alt="AV" width="50" height="50"/>
-          <div class="event-category">{{ event.category }}</div>
-          <div class="event-rating">
-            <svg class="star-icon" fill="currentColor" viewBox="0 0 24 24">
-              <path
-                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-              />
-            </svg>
-            <span>{{ event.rating }}</span>
-          </div>
+          <img
+            [src]="getImageUrl(event.eventImage)"
+            alt="event.eventName"
+            class="event-img"
+          />
+          <div class="event-category">{{ event.eventCategory }}</div>
         </div>
         <div class="event-details">
-          <h3 class="event-title">{{ event.title }}</h3>
+          <h3 class="event-title">{{ event.eventName }}</h3>
           <div class="event-info">
             <div class="info-item">
               <svg
@@ -97,7 +288,7 @@
                   d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                 />
               </svg>
-              <span>{{ event.date }}</span>
+              <span>{{ formatDate(event.startDate) }}</span>
             </div>
             <div class="info-item">
               <svg
@@ -119,7 +310,7 @@
                   d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                 />
               </svg>
-              <span>{{ event.location }}</span>
+              <span>{{ event.venue.province }}</span>
             </div>
             <div class="info-item">
               <svg
@@ -135,25 +326,55 @@
                   d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
                 />
               </svg>
-              <span>{{ event.attendees }} người tham gia</span>
+              <span>{{ getTotalSeats(event) }} chỗ ngồi</span>
             </div>
           </div>
           <div class="event-footer">
-            <div class="event-price">{{ event.price }}₫</div>
-            <button class="btn-book">Đặt vé</button>
+            <div
+              class="event-price"
+              *ngIf="event.zones && event.zones.length > 0"
+            >
+              {{ minPriceZone(event)}}
+            </div>
+            <button class="btn-book" (click)="onBookEvent(event)">
+              Đặt vé
+            </button>
           </div>
         </div>
       </div>
-      }
     </div>
 
-    <div class="view-all-container">
-      <button class="btn-view-all">Xem tất cả sự kiện</button>
+    <div class="no-events" *ngIf="!isLoading() && featuredEvents.length === 0">
+      <div class="no-events-content">
+        <svg
+          class="no-events-icon"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+          />
+        </svg>
+        <h3>Không có sự kiện nào</h3>
+        <p>Hiện tại chưa có sự kiện nổi bật nào. Vui lòng quay lại sau!</p>
+      </div>
+    </div>
+
+    <div
+      class="view-all-container"
+      *ngIf="!isLoading() && featuredEvents.length > 0"
+    >
+      <button class="btn-view-all" (click)="onViewAllEvents()">
+        Xem tất cả sự kiện
+      </button>
     </div>
   </div>
 </section>
 
-<!-- Features Section -->
 <section class="features">
   <div class="container">
     <div class="section-header">
@@ -164,113 +385,66 @@
     </div>
 
     <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="feature-card" *ngFor="let feature of features">
+        <div class="feature-icon" [ngSwitch]="feature.title">
+          <svg
+            *ngSwitchCase="'Thanh toán an toàn'"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <svg
+            *ngSwitchCase="'Check-in QR Code'"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13 10V3L4 14h7v7l9-11h-7z"
+              d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
+            />
+          </svg>
+          <svg
+            *ngSwitchCase="'Real-time Updates'"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          <svg
+            *ngSwitchCase="'Tìm kiếm thông minh'"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+            />
+          </svg>
+          <svg
+            *ngSwitchCase="'Quản lý dễ dàng'"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+            />
+          </svg>
+          <svg
+            *ngSwitchCase="'Hỗ trợ 24/7'"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3z"
             />
           </svg>
         </div>
-        <h3 class="feature-title">Đặt vé nhanh chóng</h3>
-        <p class="feature-description">
-          Chỉ với vài click, bạn đã có vé tham gia sự kiện yêu thích
-        </p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-            />
-          </svg>
-        </div>
-        <h3 class="feature-title">Bảo mật tuyệt đối</h3>
-        <p class="feature-description">
-          Thông tin cá nhân và thanh toán được bảo vệ với công nghệ mã hóa tiên
-          tiến
-        </p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"
-            />
-          </svg>
-        </div>
-        <h3 class="feature-title">Hỗ trợ 24/7</h3>
-        <p class="feature-description">
-          Đội ngũ chăm sóc khách hàng luôn sẵn sàng hỗ trợ bạn mọi lúc, mọi nơi
-        </p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
-            />
-          </svg>
-        </div>
-        <h3 class="feature-title">Vé điện tử</h3>
-        <p class="feature-description">
-          Quản lý vé dễ dàng với mã QR, không lo thất lạc hay quên vé
-        </p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
-            />
-          </svg>
-        </div>
-        <h3 class="feature-title">Giá cả minh bạch</h3>
-        <p class="feature-description">
-          Không có phí ẩn, giá vé rõ ràng và nhiều ưu đãi hấp dẫn
-        </p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9"
-            />
-          </svg>
-        </div>
-        <h3 class="feature-title">Đa dạng sự kiện</h3>
-        <p class="feature-description">
-          Từ âm nhạc, thể thao đến hội thảo, luôn có sự kiện phù hợp với bạn
-        </p>
+        <h3 class="feature-title">{{ feature.title }}</h3>
+        <p class="feature-description">{{ feature.description }}</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Categories -->
 <section class="categories">
   <div class="container">
     <div class="section-header">
@@ -281,84 +455,21 @@
     </div>
 
     <div class="categories-grid">
-      <div class="category-card music">
-        <div class="category-icon">🎵</div>
-        <h3 class="category-name">Âm nhạc</h3>
-      </div>
-      <div class="category-card sports">
-        <div class="category-icon">⚽</div>
-        <h3 class="category-name">Thể thao</h3>
-      </div>
-      <div class="category-card tech">
-        <div class="category-icon">💻</div>
-        <h3 class="category-name">Công nghệ</h3>
-      </div>
-      <div class="category-card business">
-        <div class="category-icon">💼</div>
-        <h3 class="category-name">Kinh doanh</h3>
-      </div>
-      <div class="category-card art">
-        <div class="category-icon">🎨</div>
-        <h3 class="category-name">Nghệ thuật</h3>
-      </div>
-      <div class="category-card food">
-        <div class="category-icon">🍜</div>
-        <h3 class="category-name">Ẩm thực</h3>
+      <div
+        class="category-card"
+        *ngFor="let category of categories() | slice : 0 : 6; let i = index"
+        [ngClass]="'category-' + i"
+        (click)="onCategoryClick(category.name)"
+      >
+        <div class="category-icon">{{ getCategoryIcon(category.name) }}</div>
+        <h3 class="category-name">{{ category.name }}</h3>
       </div>
     </div>
   </div>
+  <p-scrolltop
+    target="window"
+    [threshold]="100"
+    icon="pi pi-arrow-up"
+    [buttonProps]="{ severity: 'contrast', raised: true, rounded: true }"
+  />
 </section>
-
-<script>
-  // Simple interactivity
-  document.addEventListener("DOMContentLoaded", function () {
-    // Search functionality
-    const searchInput = document.querySelector(".search-input");
-    const searchBtn = document.querySelector(".search-btn");
-
-    searchBtn.addEventListener("click", function () {
-      const query = searchInput.value.trim();
-      if (query) {
-        alert(`Đang tìm kiếm: "${query}"`);
-      }
-    });
-
-    searchInput.addEventListener("keypress", function (e) {
-      if (e.key === "Enter") {
-        searchBtn.click();
-      }
-    });
-
-    // Book ticket buttons
-    const bookBtns = document.querySelectorAll(".btn-book");
-    bookBtns.forEach((btn) => {
-      btn.addEventListener("click", function () {
-        alert("Chức năng đặt vé sẽ được triển khai sớm!");
-      });
-    });
-
-    // Category cards
-    const categoryCards = document.querySelectorAll(".category-card");
-    categoryCards.forEach((card) => {
-      card.addEventListener("click", function () {
-        const categoryName = card.querySelector(".category-name").textContent;
-        alert(`Đang tải sự kiện ${categoryName}...`);
-      });
-    });
-
-
-
-    // Smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-      anchor.addEventListener("click", function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute("href"));
-        if (target) {
-          target.scrollIntoView({
-            behavior: "smooth",
-          });
-        }
-      });
-    });
-  });
-</script>

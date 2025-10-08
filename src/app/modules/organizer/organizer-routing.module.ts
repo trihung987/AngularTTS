@@ -2,6 +2,8 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { CreateEventComponent } from './pages/create-event/create-event.component';
 import { EventsListComponent } from './pages/events-list/events-list.component';
+import { RevenueAnalyticsComponent } from './pages/revenue-analytics/revenue-analytics.component';
+import { EventDetailComponent } from './pages/event-detail/event-detail.component';
 
 const routes: Routes = [
   {
@@ -15,6 +17,14 @@ const routes: Routes = [
   {
     path: 'events',
     component: EventsListComponent,
+  },
+  {
+    path: 'events/:id',
+    component: EventDetailComponent,
+  },
+  {
+    path: 'revenue',
+    component: RevenueAnalyticsComponent,
   },
 
   {

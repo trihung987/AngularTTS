@@ -48,7 +48,7 @@ export class AuthService {
   }
 
   signUp(data: SignUpRequest): Observable<string> {
-    return this.http.post('/auth/register', data);
+    return this.http.post('/auth/register', data, "text");
   }
 
   login(data: LoginRequest): Observable<tokenDto> {
@@ -107,6 +107,10 @@ export class AuthService {
     const accessToken = this.storage.getItem('accessToken');
     return !!accessToken;
   }
+
+   initFromLocalStorage() {
+
+   }
 
   clearDataAuth() {
     this.storage.removeItem('accessToken');

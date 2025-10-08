@@ -15,6 +15,8 @@ export interface Events {
   eventBanner: string; // URL đến ảnh bìa
   eventCategory: string;
   eventDescription: string;
+  ownerId?: string; // UUID của Java được chuyển thành 'string'
+  ownerName?: string;
   venue: Venue;
   organizer: Organizer;
   startDate: string; // LocalDate của Java được chuyển thành 'string' (vd: "2025-08-25")
@@ -26,9 +28,8 @@ export interface Events {
   timezone: string;
   zones: Zone[];
   bankInfo: BankInfo;
-  status: 'DRAFT' | 'PUBLISHED';
+  eventStatus: 'DRAFT' | 'PUBLISHED';
 
-  // Các trường được tính toán từ backend
   totalSeats: number;
   totalRevenue: number;
 }

@@ -9,6 +9,14 @@ import { AuthRedirectGuard } from './core/guard/auth-redirect.guard';
 import { OrganizeLayoutComponent } from './modules/organizer/components/organize-layout/organize-layout.component';
 import { NotFoundComponent } from './shared/components/not-found/not-found.component';
 import { EventListComponent } from './modules/events/pages/event-list/event-list.component';
+import { EventDetailComponent } from './modules/events/pages/event-detail/event-detail.component';
+import { ZoneSelectComponent } from './modules/events/pages/zone-select/zone-select.component';
+import { ReservationPageComponent } from './modules/events/pages/reservation/reservation.component';
+import { PaymentSuccessComponent } from './modules/events/pages/payment-result/payment-result.component';
+import { ProfileComponent } from './modules/profile/pages/profile/profile.component';
+import { CanDeactivateGuard } from './core/guard/can-deactive.guard';
+import { AuthAdminGuard } from './core/guard/auth-admin.guard';
+import { EventValidateComponent } from './modules/admin/pages/event-validate/event-validate.component';
 
 export const routes: Routes = [
   {
@@ -26,6 +34,50 @@ export const routes: Routes = [
         component: HomeComponent,
       },
       {
+        path: 'events',
+        component: EventListComponent,
+      },
+      {
+        path: 'event-detail/:id',
+        component: EventDetailComponent,
+      },
+      {
+        path: 'event-detail/:id/zone-select',
+        canActivate: [AuthGuard],
+        component: ZoneSelectComponent,
+      },
+      {
+        path: 'admin/event-validate',
+        canActivate: [AuthAdminGuard],
+        component: EventValidateComponent,
+      },
+      {
+        path: 'reservation/:id',
+        canActivate: [AuthGuard],
+        component: ReservationPageComponent,
+        canDeactivate: [CanDeactivateGuard],
+      },
+      {
+        path: 'payment-result',
+        canActivate: [AuthGuard],
+        component: PaymentSuccessComponent,
+      },
+      {
+        path: 'reservation',
+        canActivate: [AuthGuard],
+        canDeactivate: [CanDeactivateGuard],
+        component: ReservationPageComponent,
+      },
+      {
+        path: 'profile',
+        canActivate: [AuthGuard],
+        component: ProfileComponent,
+        loadChildren: () =>
+          import('./modules/profile/profile.module').then(
+            (m) => m.ProfileModule
+          ),
+      },
+      {
         path: 'about',
         canActivate: [AuthGuard], // Trang about được bảo vệ, chỉ người đã login mới vào được
         loadChildren: () =>
@@ -34,6 +86,7 @@ export const routes: Routes = [
       { path: 'notfound', component: NotFoundComponent },
     ],
   },
+
   {
     path: 'organizer',
     canActivate: [AuthGuard], // Bảo vệ cả module organizer
@@ -43,16 +96,7 @@ export const routes: Routes = [
         (m) => m.OrganizerModule
       ),
   },
-  {
-    path: 'events',
-    component: MainLayoutComponent,
-    children: [
-      {
-        path: '',
-        component: EventListComponent,
-      },
-    ],
-  },
+
   { path: '**', redirectTo: 'notfound' },
 ];
 

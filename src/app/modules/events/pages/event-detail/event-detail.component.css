@@ -1,0 +1,769 @@
+/* event-detail.component.css */
+
+
+.all {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background: white;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.loading-overlay,
+.error-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  font-size: 1.2rem;
+  padding: 40px;
+  text-align: center;
+}
+
+.error-message {
+  color: #ff6b6b;
+  background-color: #fff5f5;
+  border: 1px solid #fed7d7;
+  border-radius: 8px;
+  margin: 20px;
+}
+
+.banner {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(45, 43, 43);
+  padding: 30px 0;
+}
+
+.concert-container {
+  display: flex;
+  max-width: 1500px;
+  width: 100%;
+  height: 500px;
+  position: relative;
+  padding: 10px;
+  overflow: hidden;
+  border: 1px solid transparent;
+}
+
+/* Left Panel - Dark Info Section */
+.info-panel {
+  flex: 1;
+  background: linear-gradient(135deg, #706666, #2d2d2d);
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-right: 1px solid #1a1a1a;
+  /* Curved corner effects */
+  -webkit-mask:
+    radial-gradient(circle 40px at 0 0, transparent 98%, black) top left,
+    radial-gradient(circle 40px at 100% 0, transparent 98%, black) top right,
+    radial-gradient(circle 40px at 100% 100%, transparent 98%, black) bottom right,
+    radial-gradient(circle 40px at 0 100%, transparent 98%, black) bottom left;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: 50% 50%;
+  mask:
+    radial-gradient(circle 40px at 0 0, transparent 98%, black) top left,
+    radial-gradient(circle 40px at 100% 0, transparent 98%, black) top right,
+    radial-gradient(circle 40px at 100% 100%, transparent 98%, black) bottom right,
+    radial-gradient(circle 40px at 0 100%, transparent 98%, black) bottom left;
+  mask-repeat: no-repeat;
+  mask-size: 50% 50%;
+}
+
+.concert-title {
+  font-size: 30px;
+  font-weight: bold;
+  margin-bottom: 30px;
+  line-height: 1.3;
+  color: rgb(225, 221, 221);
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  min-height: calc(1.3em * 2);
+  /* bắt buộc chiếm đủ chiều cao 2 dòng */
+  display: flex;
+  overflow: hidden;
+}
+
+.event-details {
+  margin-bottom: 40px;
+}
+
+.detail-row {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  font-size: 18px;
+  color: rgb(225, 221, 221);
+}
+
+.detail-icon {
+  margin-right: 12px;
+  margin-top: 2px;
+  color: #4CAF50;
+}
+
+.venue-name {
+  font-weight: bold;
+  margin-bottom: 5px;
+  font-size: 18px;
+  color: rgb(225, 221, 221);
+}
+
+.venue-address {
+  color: #ccc;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.pricing {
+  margin-bottom: 30px;
+}
+
+.price-label {
+  color: #f5f6fa;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.price-amount {
+  font-size: 28px;
+  font-weight: bold;
+  color: greenyellow;
+}
+
+.buy-btn {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: white;
+  border: none;
+  padding: 15px 20px;
+  border-radius: 8px;
+  font-size: 19px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.buy-btn:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 4px 15px rgba(59, 130, 246, 0.4),
+    0 4px 15px rgba(139, 92, 246, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Right Panel - Colorful Poster */
+.event-banner {
+  flex: 2;
+  background-position: center;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-left: 1px solid #1a1a1a;
+  /* Curved corner effects */
+  -webkit-mask:
+    radial-gradient(circle 40px at 0 0, transparent 98%, black) top left,
+    radial-gradient(circle 40px at 100% 0, transparent 98%, black) top right,
+    radial-gradient(circle 40px at 100% 100%, transparent 98%, black) bottom right,
+    radial-gradient(circle 40px at 0 100%, transparent 98%, black) bottom left;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: 50% 50%;
+  mask:
+    radial-gradient(circle 40px at 0 0, transparent 98%, black) top left,
+    radial-gradient(circle 40px at 100% 0, transparent 98%, black) top right,
+    radial-gradient(circle 40px at 100% 100%, transparent 98%, black) bottom right,
+    radial-gradient(circle 40px at 0 100%, transparent 98%, black) bottom left;
+  mask-repeat: no-repeat;
+  mask-size: 50% 50%;
+}
+
+/* THAY ĐỔI: Cập nhật layout cho content */
+.content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  background-color: white;
+}
+
+/* THAY ĐỔI: Cập nhật layout cho left-content */
+.left-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* THAY ĐỔI: Xóa bỏ right-content và img bên trong */
+.right-content {
+  display: none;
+}
+
+.detail-content {
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 20px 0;
+  font-family: Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #333;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  background: white;
+  width: 100%;
+}
+
+.detail-content h2 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+/*  chỉ hiển thị ~3 dòng */
+.intro-content {
+  max-height: 86px;
+  line-height: 1.6;
+    font-size: 18px;
+  /* 18px (font-size) * 1.6 (line-height) * 3 (lines) =86 */
+  overflow: hidden;
+  /* //transition: max-height 0.4s ease-in-out; */
+  width: 100%;
+}
+
+.intro-content.expanded {
+  max-height: 100%;
+}
+
+.intro-content img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 10px 0;
+  /* //transition: all 0.4s ease-in-out; */
+}
+
+.intro-content p {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.intro-content b {
+  font-weight: bold;
+}
+
+.event-image-full {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-top: 15px;
+  object-fit: cover;
+}
+
+
+.toggle-btn {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  margin-top: 8px;
+  cursor: pointer;
+  color: #555;
+  font-weight: bold;
+  font-size: 14px;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.toggle-btn:hover {
+  color: #000;
+}
+
+.ticket-info {
+  background: #2d2d2d;
+  border-radius: 8px;
+  overflow: hidden;
+  width: 100%;
+  margin: 20px 0;
+  color: white;
+}
+
+.ticket-header {
+  background: #333;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+}
+
+.ticket-info-header {
+  width: 90%;
+  color: white;
+}
+
+.ticket-header span {
+  font-size: 14px;
+  color: #bbb;
+  display: block;
+  font-weight: normal;
+}
+
+.ticket-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.ticket-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: #3a3a3a;
+  border-bottom: 1px solid #2a2a2a;
+  transition: background 0.2s;
+}
+
+.ticket-row:hover {
+  background: #444;
+}
+
+.ticket-row:last-child {
+  border-bottom: none;
+}
+
+.ticket-name {
+  font-size: 16px;
+  color: white;
+}
+
+.ticket-price {
+  color: var(--price-color);
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.organizer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin: 20px 0;
+  color: #333;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  background: white;
+}
+
+.organizer h1 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.org-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px;
+  gap: 15px;
+}
+
+.left-org .logo {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.right-org {
+  color: black;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  line-height: 1.6;
+}
+
+.org-name {
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.org-bio {
+  font-size: 14px;
+  color: #555;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .concert-container {
+    flex-direction: column;
+    height: auto;
+    padding: 20px;
+  }
+
+  .info-panel {
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .event-banner {
+    height: 200px;
+  }
+
+  .content {
+    flex-direction: column;
+    padding: 15px;
+    max-width: 100%;
+  }
+
+  .left-content {
+    flex: 1;
+  }
+
+  .ticket-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .ticket-info-header {
+    width: 100%;
+    text-align: left;
+  }
+}
+
+/* Hiệu ứng xuất hiện cho info-panel */
+.info-panel {
+  flex: 1;
+  background: linear-gradient(135deg, #706666, #2d2d2d);
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-right: 1px solid #1a1a1a;
+
+  opacity: 0;
+  transform: translateX(-40px);
+  animation: slideInLeft 1s ease-out forwards;
+}
+
+/* Hiệu ứng xuất hiện cho event-banner */
+.event-banner {
+  flex: 2;
+  background-position: center;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-left: 1px solid #1a1a1a;
+
+  opacity: 0;
+  transform: translateX(40px);
+  animation: slideInRight 1s ease-out forwards;
+
+  /* Hiệu ứng zoom nền */
+  animation: slideInRight 1s ease-out forwards, bgZoom 15s ease-in-out infinite;
+}
+
+/* Keyframes cho chuyển động */
+@keyframes slideInLeft {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.buy-btn.disabled,
+.buy-btn:disabled {
+  background: #a0aec0;
+  /* Màu xám */
+  color: #e2e8f0;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.buy-btn.disabled:hover,
+.buy-btn:disabled:hover {
+  background: #a0aec0;
+  box-shadow: none;
+  transform: none;
+}
+
+/*dialog*/
+/* Dialog Mask */
+::ng-deep .p-dialog-mask {
+  background-color: rgba(0, 0, 0, 0.6);
+
+}
+
+/* Dialog Container */
+::ng-deep .reservation-dialog.p-dialog {
+  width: 90%;
+  max-width: 500px;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+/* Dialog Header */
+::ng-deep .reservation-dialog .p-dialog-header {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 12px 12px 0 0;
+  border-bottom: none;
+}
+
+::ng-deep .reservation-dialog .p-dialog-title {
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+/* Dialog Content */
+::ng-deep .reservation-dialog .p-dialog-content {
+  padding: 2rem 1.5rem;
+  background: white;
+}
+
+/* Dialog Footer */
+::ng-deep .reservation-dialog .p-dialog-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  background: white;
+  border-radius: 0 0 12px 12px;
+}
+
+/* Custom Dialog Content Styles */
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+}
+
+.dialog-icon {
+  font-size: 3rem;
+  color: #3b82f6;
+}
+
+.dialog-icon i {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.dialog-message {
+  color: #333;
+  line-height: 1.6;
+  width: 100%;
+}
+
+.dialog-message p {
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+}
+
+.reservation-details {
+  background: #f8f9fa;
+  padding: 1.25rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  text-align: left;
+  border-left: 4px solid #3b82f6;
+}
+
+.reservation-id {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+}
+
+.reservation-id .highlight {
+  color: #3b82f6;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+  background: #e0e7ff;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.reservation-extra-info {
+  margin: 0.75rem 0;
+  padding: 0.5rem;
+  background: white;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.time-remaining {
+  display: block;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #dee2e6;
+  color: #ff6b6b;
+  font-size: 0.95rem;
+}
+
+.time-remaining strong {
+  color: #d63031;
+  font-size: 1.05rem;
+}
+
+.dialog-question {
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #2d3748;
+  margin-top: 1rem;
+}
+
+.cancelling-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: #fff3cd;
+  border-radius: 6px;
+  color: #856404;
+}
+
+.cancelling-loader i {
+  font-size: 1.2rem;
+}
+
+/* Custom Footer Styles */
+.custom-dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+/* Button Styles */
+::ng-deep .reservation-dialog .p-button {
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+::ng-deep .reservation-dialog .p-button-primary {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  border: none;
+  color: white;
+}
+
+::ng-deep .reservation-dialog .p-button-primary:not(:disabled):hover {
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+::ng-deep .reservation-dialog .p-button-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #9ca3af;
+}
+
+::ng-deep .reservation-dialog .p-button-danger {
+  color: #dc2626;
+  background: transparent;
+  border: 1px solid transparent;
+}
+
+::ng-deep .reservation-dialog .p-button-danger:not(:disabled):hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #dc2626;
+  color: #b91c1c;
+}
+
+::ng-deep .reservation-dialog .p-button-danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Responsive adjustments for dialog */
+@media (max-width: 768px) {
+  ::ng-deep .reservation-dialog.p-dialog {
+    width: 95vw !important;
+    max-width: none !important;
+  }
+
+  ::ng-deep .reservation-dialog .p-dialog-header {
+    padding: 1.25rem;
+  }
+
+  ::ng-deep .reservation-dialog .p-dialog-content {
+    padding: 1.5rem 1rem;
+  }
+
+  ::ng-deep .reservation-dialog .p-dialog-footer {
+    padding: 1rem;
+  }
+
+  .custom-dialog-footer {
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+  }
+
+  .custom-dialog-footer button {
+    width: 100%;
+  }
+
+  .dialog-icon {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  ::ng-deep .reservation-dialog .p-dialog-title {
+    font-size: 1.1rem;
+  }
+
+  .dialog-message p {
+    font-size: 0.95rem;
+  }
+
+  .dialog-question {
+    font-size: 1rem;
+  }
+
+  .reservation-details {
+    padding: 1rem;
+  }
+}
+
+

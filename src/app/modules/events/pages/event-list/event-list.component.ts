@@ -15,7 +15,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CreateEventService } from '../../../organizer/services/events.service';
 
 // PrimeNG Imports
@@ -29,8 +29,8 @@ import { TooltipModule } from 'primeng/tooltip';
 import { EventCardComponent } from '../../components/event-card/event-card.component';
 import { SelectModule } from 'primeng/select';
 import { OverlayModule } from 'primeng/overlay';
-import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
-
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { EventsPaginationComponent } from "../../../organizer/components/events-pagination/events-pagination.component";
 
 export type SortOption =
   | 'eventName'
@@ -45,9 +45,15 @@ export interface EventCategory {
   label: string;
 }
 
+export interface SortOptionConfig {
+  value: SortOption;
+  label: string;
+  directions: { value: SortDirection; label: string }[];
+}
+
 interface PaginatorEvent {
   first?: number;
-  rows?: number; // Fix: 'rows' is now optional
+  rows?: number;
   page?: number;
   pageCount?: number;
 }
@@ -69,16 +75,17 @@ interface PaginatorEvent {
     OverlayModule,
     TooltipModule,
     EventCardComponent,
-    MatProgressSpinnerModule
-],
+    MatProgressSpinnerModule,
+    EventsPaginationComponent,
+  ],
 })
 export class EventListComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private searchSubject = new Subject<string>();
 
   events: Events[] = [];
-  currentPage = 0; //
-  pageSize = 8; // Changed to 8 for 4x2 grid
+  currentPage = 0;
+  pageSize = 12;
   totalElements = 0;
   totalPages = 0;
   isLoading = signal(true);
@@ -87,7 +94,7 @@ export class EventListComponent implements OnInit, OnDestroy {
   // Filter options
   searchTerm = '';
   selectedCategory = '';
-  selectedSort: SortOption = 'updatedDate';
+  selectedSort: SortOption = 'startDate';
   selectedSortDirection: SortDirection = 'ASC';
 
   categories: EventCategory[] = [
@@ -103,14 +110,10 @@ export class EventListComponent implements OnInit, OnDestroy {
     { value: 'Du lịch', label: 'Du lịch' },
   ];
 
-  sortOptions: {
-    value: SortOption;
-    label: string;
-    directions: { value: SortDirection; label: string }[];
-  }[] = [
+  sortOptions: SortOptionConfig[] = [
     {
       value: 'startDate',
-      label: 'Ngày diễn ra',
+      label: 'Ngày bắt đầu',
       directions: [
         { value: 'ASC', label: 'Sớm nhất' },
         { value: 'DESC', label: 'Muộn nhất' },
@@ -118,10 +121,10 @@ export class EventListComponent implements OnInit, OnDestroy {
     },
     {
       value: 'updatedDate',
-      label: 'Ngày diễn ra',
+      label: 'Ngày cập nhật',
       directions: [
-        { value: 'ASC', label: 'Sớm nhất' },
-        { value: 'DESC', label: 'Muộn nhất' },
+        { value: 'DESC', label: 'Mới nhất' },
+        { value: 'ASC', label: 'Cũ nhất' },
       ],
     },
     {
@@ -146,40 +149,108 @@ export class EventListComponent implements OnInit, OnDestroy {
     private eventService: EventService,
     private createEventService: CreateEventService,
     private toastr: ToastrService,
-    private router: Router
+    private router: Router,
+    private activatedRoute: ActivatedRoute
   ) {}
 
+  // ngOnInit(): void {
+  //   //this.setupSearch();
+  //   this.loadEvents();
+  // }
+
   ngOnInit(): void {
-    this.setupSearch();
-    this.loadEvents();
+    window.scrollTo({ top: 0 });
+    this.activatedRoute.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params) => {
+        this.searchTerm = params['search'] || '';
+        this.selectedCategory = params['category'] || '';
+        this.currentPage = params['page'] ? Number(params['page']) : 0;
+        this.selectedSort = (params['sortBy'] as SortOption) || 'startDate';
+        this.selectedSortDirection =
+          (params['sortDirection'] as SortDirection) || 'ASC';
+
+        this.validateSortDirection();
+        this.loadEvents();
+      });
+  }
+
+  //Kiểm tra xem option sort có chính xác tồn tại không
+  private validateSortDirection(): void {
+    const selectedOption = this.sortOptions.find(
+      (opt) => opt.value === this.selectedSort
+    );
+    if (selectedOption) {
+      const isValidDirection = selectedOption.directions.some(
+        (dir) => dir.value === this.selectedSortDirection
+      );
+      if (!isValidDirection) {
+        this.selectedSortDirection = selectedOption.directions[0].value;
+      }
+    }
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
+  // onEnterSearch(): void {
+  //   if (this.isLoading()) {
+  //     return;
+  //   }
+  //   this.currentPage = 0;
+  //   this.loadEvents();
+  // }
 
-  private setupSearch(): void {
-    this.searchSubject
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe((searchTerm) => {
-        this.searchTerm = searchTerm;
-        this.currentPage = 0; // Reset to first page
-        this.loadEvents();
-      });
+  onEnterSearch(): void {
+    if (this.isLoading()) return;
+
+    const queryParams = {
+      search: this.searchTerm || null,
+      category: this.selectedCategory || null,
+      sortBy: this.selectedSort,
+      sortDirection: this.selectedSortDirection,
+      page: 0,
+    };
+
+    this.router.navigate([], {
+      relativeTo: this.activatedRoute,
+      queryParams,
+      queryParamsHandling: 'merge',
+    });
   }
+  onKeyDown(event: KeyboardEvent): void {
+    if (event.key === 'Enter' || event.code === 'Enter') {
+      this.onEnterSearch();
+    }
+  }
+
+  //gõ xong tự search luôn
+  // private setupSearch(): void {
+  //   this.searchSubject
+  //     .pipe(debounceTime(800), distinctUntilChanged(), takeUntil(this.destroy$))
+  //     .subscribe((searchTerm) => {
+  //       this.searchTerm = searchTerm;
+  //       this.currentPage = 0;
+  //       this.loadEvents();
+  //     });
+  // }
 
   private loadEvents(): void {
     this.isLoading.set(true);
 
-    const params: EventsListParams = {
+    var params: EventsListParams = {
       page: this.currentPage,
       size: this.pageSize,
       sortBy: this.selectedSort,
       sortDirection: this.selectedSortDirection,
     };
+    if (params.sortBy === 'startDate') {
+      params.validateDate = true;
+    }else {
+      params.validateDate = false;
+    }
 
-    // Add search term if exists
     if (this.searchTerm.trim()) {
       params.search = this.searchTerm.trim();
     }
@@ -192,7 +263,6 @@ export class EventListComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (response: EventsListResponse) => {
-          // Filter by category on frontend if needed (since backend might not support category filter)
           let filteredEvents = response.events;
           if (this.selectedCategory) {
             filteredEvents = response.events.filter(
@@ -215,10 +285,64 @@ export class EventListComponent implements OnInit, OnDestroy {
       });
   }
 
-  onSearch(event: Event) {
-    const target = event.target as HTMLInputElement;
-    this.searchSubject.next(target.value);
+  // onSearch(event: Event) {
+  //   const target = event.target as HTMLInputElement;
+  //   this.searchSubject.next(target.value);
+  // }
+
+  onFilterChange(): void {
+    // When sort option changes, reset direction to default
+    this.validateSortDirection();
+
+    const queryParams = {
+      search: this.searchTerm || null,
+      category: this.selectedCategory || null,
+      sortBy: this.selectedSort,
+      sortDirection: this.selectedSortDirection,
+      page: 0, // Reset to first page on any filter change
+    };
+
+    this.router.navigate([], {
+      relativeTo: this.activatedRoute,
+      queryParams,
+      queryParamsHandling: 'merge', // Keeps other params
+    });
   }
+
+  onPageChange(page: number): void {
+    page = page - 1;
+    this.router.navigate([], {
+      relativeTo: this.activatedRoute, //giữ nguyên gốc url ban đầu (/events) mà k thay đổi về /
+      queryParams: { page },
+      queryParamsHandling: 'merge', //giữ lại query params cũ, chỉ merge (ghi đè nếu trùng key) với query params mới.
+    });
+    this.scrollToTop();
+  }
+
+  clearFilters(): void {
+    this.router.navigate([], {
+      relativeTo: this.activatedRoute,
+    });
+  }
+
+  // clearFilters(): void {
+  //   this.searchTerm = '';
+  //   this.selectedCategory = '';
+  //   this.selectedSort = 'startDate';
+  //   this.selectedSortDirection = 'ASC';
+  //   this.currentPage = 1;
+  //   this.loadEvents();
+  // }
+
+  hasActiveFilters(): boolean {
+    return !!(this.searchTerm || this.selectedCategory);
+  }
+
+  // onPageChange(page: number) {
+  //   this.currentPage = page - 1;
+  //   this.loadEvents();
+  //   this.scrollToTop();
+  // }
 
   onCategoryChange(): void {
     this.currentPage = 0;
@@ -242,11 +366,11 @@ export class EventListComponent implements OnInit, OnDestroy {
     this.loadEvents();
   }
 
-  onPageChange(event: PaginatorEvent): void {
-    this.currentPage = event.page || 0;
-    this.loadEvents();
-    this.scrollToTop();
-  }
+  // onPageChange(event: PaginatorEvent): void {
+  //   this.currentPage = event.page || 0;
+  //   this.loadEvents();
+  //   this.scrollToTop();
+  // }
 
   toggleView(view: 'grid' | 'list'): void {
     this.currentView = view;
@@ -256,19 +380,6 @@ export class EventListComponent implements OnInit, OnDestroy {
         'Thông báo'
       );
     }
-  }
-
-  clearFilters(): void {
-    this.searchTerm = '';
-    this.selectedCategory = '';
-    this.selectedSort = 'updatedDate';
-    this.selectedSortDirection = 'ASC';
-    this.currentPage = 0;
-    this.loadEvents();
-  }
-
-  hasActiveFilters(): boolean {
-    return !!(this.searchTerm || this.selectedCategory);
   }
 
   getCategoryLabel(categoryValue: string): string {
@@ -284,13 +395,9 @@ export class EventListComponent implements OnInit, OnDestroy {
   }
 
   bookEvent(event: Events): void {
-    // Navigate to event detail page using slug
     console.log('Viewing event details:', event);
-    // this.router.navigate(['/events', event.slug]);
-    this.toastr.success(
-      `Đang chuyển đến trang chi tiết sự kiện: "${event.eventName}"`,
-      'Thành công'
-    );
+
+    this.router.navigate(['/event-detail/', event.id]);
   }
 
   goBack(): void {
@@ -303,7 +410,7 @@ export class EventListComponent implements OnInit, OnDestroy {
   }
 
   private scrollToTop(): void {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
   }
 
   getImg(url: string): string | null {
@@ -320,7 +427,6 @@ export class EventListComponent implements OnInit, OnDestroy {
     return 'assets/images/notfoundimg.webp';
   }
 
-  // Helper methods for the template
   formatPrice(zones: any[]): string {
     if (!zones || zones.length === 0) {
       return 'Liên hệ';

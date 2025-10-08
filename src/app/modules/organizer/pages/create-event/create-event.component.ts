@@ -1,3 +1,4 @@
+import { EventData } from './../../services/events.service';
 import { HttpService } from './../../../../shared/services/http.service';
 import { ToastrService } from 'ngx-toastr';
 // create-event.component.ts
@@ -22,11 +23,12 @@ import {
 import { Subject, takeUntil } from 'rxjs';
 
 // Import step components
-import { CreateEventService, EventData } from '../../services/events.service';
+import { CreateEventService} from '../../services/events.service';
 import { Step1InfoComponent } from '../../components/step-create/step1-info/step1-info.component';
 import { Step2TimeComponent } from '../../components/step-create/step2-time/step2-time.component';
 import { Step4PaymentComponent } from '../../components/step-create/step4-payment/step4-payment.component';
 import { Step3ZoneComponent } from '../../components/step-create/step3-zone/step3-zone.component';
+import { ScrollTop } from "primeng/scrolltop";
 
 interface StepConfig {
   id: number;
@@ -47,7 +49,8 @@ interface StepConfig {
     Step2TimeComponent,
     Step3ZoneComponent,
     Step4PaymentComponent,
-  ],
+    ScrollTop
+],
   templateUrl: './create-event.component.html',
   styleUrls: ['./create-event.component.css'],
   animations: [
@@ -120,8 +123,8 @@ export class CreateEventComponent implements OnInit, OnDestroy {
     },
     {
       id: 2,
-      title: 'Thời gian & Đường dẫn',
-      subtitle: 'Lịch trình và URL slug',
+      title: 'Thời gian diễn ra',
+      subtitle: 'Lịch trình sự kiện',
       icon: 'clock',
       completed: false,
       active: false,
@@ -167,9 +170,12 @@ export class CreateEventComponent implements OnInit, OnDestroy {
           this.eventId = id;
           this.loadEventData(id);
         } else {
-          // Không có id thì chuyển sang create-event
+          //Không có id thì redirect to create thay vì url edit
+
           this.createEventService.resetEventData();
-          this.router.navigate(['/create-event'], { replaceUrl: true });
+          this.router.navigate(['/organizer/create-event'], {
+            replaceUrl: true,
+          });
         }
       } else if (currentPath === 'create-event') {
         // Trường hợp route là create
@@ -192,27 +198,30 @@ export class CreateEventComponent implements OnInit, OnDestroy {
   //load data from id
   private recalculateStepCompletion(): void {
     setTimeout(() => {
+
+
       const step1Complete = this.step1Component?.validateStep(false) ?? false;
       const step2Complete = this.step2Component?.validateStep(false) ?? false;
       const step3Complete =
         this.step3Component?.validateAndEmitStepComplete(false) ?? false;
       const step4Complete = this.step4Component?.validateStep(false) ?? false;
-      console.log(
-        'recalculate step 3',
-        step3Complete,
-        ' - ',
-        this.step3Component?.validateAndEmitStepComplete(false)
-      );
-      console.log(
-        'recalculate step 2',
-        step2Complete,
-        ' - ',
-        this.step2Component?.validateStep(false)
-      );
-      this.createEventService.setStepCompletion(1, step1Complete);
-      this.createEventService.setStepCompletion(2, step2Complete);
-      this.createEventService.setStepCompletion(3, step3Complete);
-      this.createEventService.setStepCompletion(4, step4Complete);
+      const eventData = this.createEventService.getCurrentEventData();
+
+      // đánh dấu hoàn thành hay không từ data load ra được nếu stepComponent null (chưa render)
+      const validateEarlyStep1 = !!eventData.eventName;
+      const validateEarlyStep2 = !!eventData.startDate;
+      const validateEarlyStep3 = !!eventData.zones && eventData.zones.length > 0;
+      const validateEarlyStep4 = !!eventData.bankInfo;
+      console.log('result load data step complete', validateEarlyStep1, validateEarlyStep2, validateEarlyStep3, validateEarlyStep4);
+      this.createEventService.setStepCompletion(1, this.step1Component != null? step1Complete : validateEarlyStep1);
+      this.createEventService.setStepCompletion(2, this.step2Component != null? step2Complete : validateEarlyStep2);
+      this.createEventService.setStepCompletion(3, this.step3Component != null? step3Complete : validateEarlyStep3);
+      this.createEventService.setStepCompletion(4, this.step4Component != null? step4Complete : validateEarlyStep4);
+      const lastStep = validateEarlyStep4 ? 4 : validateEarlyStep3 ? 3 : validateEarlyStep2 ? 2 : 1;
+
+      setTimeout(() => {
+         this.goToStep(lastStep);
+      }, 50);
     }, 0);
   }
 
@@ -283,8 +292,16 @@ export class CreateEventComponent implements OnInit, OnDestroy {
   }
 
   isNotCompleted(): boolean {
-    return !this.steps.every((step) => step.completed);
+  console.log("current", this.currentStep);
+  if (this.currentStep === 4) {
+    const allPrevCompleted = this.steps
+      .slice(0, 3)
+      .every(step => step.completed);
+
+    return !allPrevCompleted;
   }
+  return true;
+}
 
   canGoToStep(stepId: number): boolean {
     if (stepId === 1) return true;
@@ -310,6 +327,7 @@ export class CreateEventComponent implements OnInit, OnDestroy {
       );
       return;
     }
+    console.log("go to step", stepId, this.canGoToStep(stepId));
     if (this.canGoToStep(stepId)) {
       this.currentStep = stepId;
       this.updateActiveStep();
@@ -409,9 +427,7 @@ export class CreateEventComponent implements OnInit, OnDestroy {
         );
         if (exit) this.router.navigate(['/organizer/events']);
       },
-      error: (error) => {
-
-      },
+      error: (error) => {},
     });
   }
 
@@ -419,7 +435,7 @@ export class CreateEventComponent implements OnInit, OnDestroy {
     if (this.currentStep !== 4) return;
 
     if (
-      !this.steps.every((step) => step.completed) ||
+      this.isNotCompleted() ||
       !this.validateCurrentStep()
     ) {
       this.toastrService.error(
@@ -433,7 +449,7 @@ export class CreateEventComponent implements OnInit, OnDestroy {
       next: () => {
         const action = this.eventId ? 'cập nhật và' : '';
         this.toastrService.success(
-          `Sự kiện của bạn đã được ${action} xuất bản`,
+          `Sự kiện của bạn đã được ${action} đưa vào hàng chờ phê duyệt`,
           'Thành công'
         );
         this.router.navigate(['/organizer/events']);

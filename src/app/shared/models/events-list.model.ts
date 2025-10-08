@@ -12,8 +12,9 @@ export interface EventsListResponse {
 export interface EventsListParams {
   page: number;
   size: number;
-  status?: 'ALL' | 'DRAFT' | 'PUBLISHED';
+  status?: 'ALL' | 'DRAFT' | 'PUBLISHED' | 'PENDING' | 'REJECTED';
   search?: string;
   sortBy?: string;
   sortDirection?: 'ASC' | 'DESC';
+  validateDate?: boolean;
 }

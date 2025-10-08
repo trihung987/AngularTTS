@@ -85,7 +85,7 @@
         <!-- Account Holder -->
         <div class="form-group full-width">
           <label class="form-label">
-            <span>Tên chủ tài khoản *</span>
+            <span><line-required label="Tên chủ tài khoản" /></span>
             <span class="char-count"
               >{{ (eventData.bankInfo?.accountHolder || "").length }}/50</span
             >
@@ -128,7 +128,7 @@
         <!-- Account Number -->
         <div class="form-group">
           <label class="form-label">
-            <span>Số tài khoản *</span>
+            <span><line-required label="Số tài khoản"/></span>
             <span
               *ngIf="isValidAccountNumber()"
               class="validation-status valid"
@@ -150,6 +150,7 @@
           <input
             type="text"
             (input)="onAccountNumberInput($event)"
+            [value]="formattedAccountNumber"
             class="form-input account-number"
             [class.error]="validationErrors['accountNumber']"
             [class.valid]="isValidAccountNumber()"
@@ -157,6 +158,7 @@
             maxlength="24"
             autocomplete="off"
           />
+
           <div *ngIf="validationErrors['accountNumber']" class="error-message">
             {{ validationErrors["accountNumber"] }}
           </div>
@@ -179,7 +181,7 @@
         <!-- Bank Name -->
         <div class="form-group">
           <label class="form-label">
-            <span>Tên ngân hàng *</span>
+            <span><line-required label="Tên ngân hàng"/></span>
           </label>
           <div class="bank-select-container">
             <!--Use ngModelChange ( This listens for changes in the input field
@@ -322,7 +324,7 @@
         <div class="card-footer">
           <div class="card-holder">
             <span class="label">Chủ tài khoản</span>
-            <span class="value">{{
+            <span class="value"> {{
               eventData.bankInfo?.accountHolder || "TÊN CHỦ TÀI KHOẢN"
             }}</span>
           </div>

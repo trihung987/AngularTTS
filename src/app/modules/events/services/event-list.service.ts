@@ -25,6 +25,9 @@ export class EventService {
       queryParams.sortBy = params.sortBy;
       queryParams.sortDirection = params.sortDirection || 'DESC';
     }
+    if (params.validateDate != null) {
+      queryParams.validateDate = params.validateDate;
+    }
 
     return this.httpService.get<EventsListResponse>(
       '/events/pagepublic',

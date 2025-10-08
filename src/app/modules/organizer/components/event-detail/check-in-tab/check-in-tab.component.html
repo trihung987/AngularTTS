@@ -1,0 +1,303 @@
+<div class="checkin-container">
+
+  <!-- Section Header -->
+  <div class="section-header">
+    <h3 class="section-title">
+      <i class="fas fa-clipboard-check"></i>
+      Danh sách check-in
+    </h3>
+    <div class="action-buttons">
+      <button class="btn btn-primary" (click)="scanQRCode()">
+        <i class="fas fa-qrcode"></i>
+        Quét QR check-in
+      </button>
+    </div>
+  </div>
+
+  <!-- Search and Filter Bar -->
+  <div class="search-filter-bar">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input
+        type="text"
+        placeholder="Tìm kiếm theo mã check-in..."
+        (input)="onSearchChange($any($event.target).value)"
+      />
+    </div>
+
+    <select
+      class="filter-select"
+      aria-label="Filter by Zone"
+      (change)="onZoneFilterChange($any($event.target).value)"
+    >
+      <option value="">Tất cả Zone</option>
+      <option *ngFor="let zone of availableZones" [value]="zone.id">
+        {{ zone.name }}
+      </option>
+    </select>
+
+    <select
+      class="filter-select"
+      aria-label="Filter by Status"
+      (change)="onStatusFilterChange($any($event.target).value)"
+    >
+      <option value="">Tất cả trạng thái</option>
+      <option [value]="CheckInStatus.CHECKED_IN">Đã vào</option>
+      <option [value]="CheckInStatus.NOT_CHECKED_IN">Chưa check-in</option>
+    </select>
+
+    <select
+      class="filter-select"
+      aria-label="Filter by Sort"
+      (change)="onSortChange($any($event.target).value)"
+    >
+      <option value="checkInTime_DESC">Sắp xếp: Mới nhất</option>
+      <option value="checkInTime_ASC">Cũ nhất</option>
+      <option value="createdDate_DESC">Tạo mới nhất</option>
+      <option value="createdDate_ASC">Tạo cũ nhất</option>
+    </select>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-message" *ngIf="loading()">
+    <i class="fas fa-spinner fa-spin"></i>
+    Đang tải dữ liệu...
+  </div>
+
+  <!-- Error State -->
+  <div class="error-message" *ngIf="error && !loading()">
+    <i class="fas fa-exclamation-circle"></i>
+    {{ error }}
+  </div>
+
+  <!-- Table -->
+  <div class="table-container" *ngIf="!loading() && !error">
+    <table>
+      <thead>
+        <tr>
+          <th><i class="fas fa-barcode"></i> Mã check-in</th>
+          <th><i class="fas fa-user"></i> Người mua</th>
+          <th><i class="fas fa-map-marker-alt"></i> Zone</th>
+          <th><i class="fas fa-id-card"></i> ID Zone</th>
+          <th><i class="fas fa-clock"></i> Thời gian</th>
+          <th><i class="fas fa-check"></i> Trạng thái</th>
+          <th><i class="fas fa-cog"></i> Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let checkIn of checkIns">
+          <td>
+            <div class="order-id">
+              <i class="fas fa-qrcode"></i>
+              {{ checkIn.checkInCode }}
+            </div>
+          </td>
+          <td>{{ checkIn.buyerName }}</td>
+          <td>{{ checkIn.zoneName }}</td>
+          <td>{{ checkIn.zoneId }}</td>
+          <td>{{ formatDateTime(checkIn.checkInTime) }}</td>
+          <td>
+            <span
+              class="checkin-badge"
+              [ngClass]="getStatusBadgeClass(checkIn.status)"
+            >
+              <i
+                class="fas"
+                [ngClass]="
+                  checkIn.status === CheckInStatus.CHECKED_IN
+                    ? 'fa-check'
+                    : 'fa-hourglass-half'
+                "
+              ></i>
+              {{ getStatusText(checkIn.status) }}
+            </span>
+          </td>
+          <td>
+            <button
+              *ngIf="checkIn.status === CheckInStatus.NOT_CHECKED_IN"
+              class="btn btn-primary btn-sm"
+              (click)="updateCheckInStatus(checkIn, CheckInStatus.CHECKED_IN)"
+            >
+              <i class="fas fa-check"></i>
+              Check-in
+            </button>
+            <button
+              *ngIf="checkIn.status === CheckInStatus.CHECKED_IN"
+              class="btn btn-secondary btn-sm"
+              (click)="
+                updateCheckInStatus(checkIn, CheckInStatus.NOT_CHECKED_IN)
+              "
+            >
+              <i class="fas fa-undo"></i>
+              Hoàn tác
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="checkIns.length === 0">
+          <td colspan="7" class="no-data">
+            <i class="fas fa-inbox"></i>
+            Không có dữ liệu check-in
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="totalPages > 1 && !loading()">
+    <button
+      class="btn btn-secondary"
+      [disabled]="currentPage === 0"
+      (click)="goToPage(currentPage - 1)"
+    >
+      <i class="fas fa-chevron-left"></i>
+      Trước
+    </button>
+    <span class="page-info">
+      Trang {{ currentPage + 1 }} / {{ totalPages }} ({{ totalElements }} kết
+      quả)
+    </span>
+    <button
+      class="btn btn-secondary"
+      [disabled]="currentPage >= totalPages - 1"
+      (click)="goToPage(currentPage + 1)"
+    >
+      Sau
+      <i class="fas fa-chevron-right"></i>
+    </button>
+  </div>
+
+  <!-- Alert Box -->
+  <div class="alert-box">
+    <div class="alert-icon">
+      <i class="fas fa-info-circle"></i>
+    </div>
+    <div class="alert-content">
+      <h4>Thống kê check-in</h4>
+      <p>
+        <strong>Tổng số check-in: {{ totalElements }}</strong> • Đã lọc theo:
+        <span *ngIf="selectedZoneId">Zone {{ selectedZoneName }}</span>
+        <span *ngIf="selectedStatus">{{ selectedStatusText }}</span>
+        <span *ngIf="!hasFilters">Tất cả</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- QR Scanner Modal -->
+  <app-qr-scanner-modal
+    *ngIf="showQRScanner"
+    (scanSuccess)="onQRCodeScanned($event)"
+    (closeModal)="closeQRScanner()"
+  ></app-qr-scanner-modal>
+
+  <!-- Confirmation Dialog -->
+  <p-dialog
+    [(visible)]="showConfirmDialog"
+    [modal]="true"
+    [style]="{width: '90vw', maxWidth: '550px'}"
+    [draggable]="false"
+    [resizable]="false">
+
+    <ng-template pTemplate="header">
+      <div class="confirm-dialog-header">
+        <i class="pi pi-check-circle" style="font-size: 1.5rem; color: #22c55e; margin-right: 0.5rem;"></i>
+        <span class="font-bold">Xác nhận Check-in</span>
+      </div>
+    </ng-template>
+
+    <div class="confirm-dialog-content" *ngIf="selectedCheckIn">
+      <!-- Success Message -->
+      <p-message
+        severity="success"
+        text="Quét QR thành công!"
+        [style]="{width: '100%', marginBottom: '1.5rem'}">
+      </p-message>
+
+      <!-- Check-in Details -->
+      <p-card>
+        <div class="checkin-detail-row">
+          <span class="detail-label">
+            <i class="pi pi-qrcode"></i> Mã check-in:
+          </span>
+          <span class="detail-value code">{{ selectedCheckIn.checkInCode }}</span>
+        </div>
+
+        <div class="checkin-detail-row">
+          <span class="detail-label">
+            <i class="pi pi-user"></i> Người mua:
+          </span>
+          <span class="detail-value">{{ selectedCheckIn.buyerName }}</span>
+        </div>
+
+        <div class="checkin-detail-row">
+          <span class="detail-label">
+            <i class="pi pi-envelope"></i> Email:
+          </span>
+          <span class="detail-value">{{ selectedCheckIn.buyerEmail }}</span>
+        </div>
+
+        <div class="checkin-detail-row">
+          <span class="detail-label">
+            <i class="pi pi-map-marker"></i> Zone:
+          </span>
+          <span class="detail-value">{{ selectedCheckIn.zoneName }}</span>
+        </div>
+
+        <div class="checkin-detail-row">
+          <span class="detail-label">
+            <i class="pi pi-calendar"></i> Thời gian tạo:
+          </span>
+          <span class="detail-value">{{ formatDateTime(selectedCheckIn.createdDate) }}</span>
+        </div>
+
+        <div class="checkin-detail-row highlight">
+          <span class="detail-label">
+            <i class="pi pi-info-circle"></i> Trạng thái:
+          </span>
+          <p-tag
+            [severity]="selectedCheckIn.status === 'CHECKED_IN' ? 'success' : 'warning'"
+            [value]="selectedCheckIn.status === 'CHECKED_IN' ? 'Đã check-in' : 'Chưa check-in'">
+          </p-tag>
+        </div>
+      </p-card>
+
+      <!-- Warning if already checked in -->
+      <p-message
+        *ngIf="selectedCheckIn.status === 'CHECKED_IN'"
+        severity="warn"
+        [style]="{width: '100%', marginTop: '1rem'}">
+        <ng-template pTemplate>
+          <div>
+            <div class="font-bold mb-2">Người dùng đã check-in</div>
+            <div>Thời gian: {{ formatDateTime(selectedCheckIn.checkInTime) }}</div>
+            <div class="mt-2">Bạn có muốn check-in lại không?</div>
+          </div>
+        </ng-template>
+      </p-message>
+
+      <!-- Confirm message -->
+      <p-message
+        *ngIf="selectedCheckIn.status !== 'CHECKED_IN'"
+        severity="info"
+        text="Xác nhận check-in cho người dùng này?"
+        [style]="{width: '100%', marginTop: '1rem'}">
+      </p-message>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <p-button
+        label="Hủy"
+        icon="pi pi-times"
+        (onClick)="cancelConfirmDialog()"
+        [outlined]="true"
+        [disabled]="confirmLoading">
+      </p-button>
+      <p-button
+        [label]="confirmLoading ? 'Đang xử lý...' : 'Xác nhận Check-in'"
+        [icon]="confirmLoading ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
+        (onClick)="confirmCheckIn()"
+        [loading]="confirmLoading">
+      </p-button>
+    </ng-template>
+  </p-dialog>
+</div>

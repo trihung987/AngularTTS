@@ -1,0 +1,136 @@
+@if (event()) {
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-content">
+        <div class="event-title">
+          <div class="event-icon">
+            <i class="fas fa-music"></i>
+          </div>
+          <div class="event-info">
+            <h1>{{ event()!.eventName }}</h1>
+            <div class="event-date">
+              <i class="far fa-calendar-alt"></i>
+              <span>{{ formatDate(event()!.startDate) }} - {{ formatTime(event()!.startTime) }}</span>
+              <span style="margin-left: 15px">
+                <i class="fas fa-map-marker-alt"></i> {{ event()!.venue.address }}, {{ event()!.venue.province }}
+              </span>
+            </div>
+          </div>
+        </div>
+        @if (eventTimeStatus()) {
+          <div class="status-badge" [ngClass]="eventTimeStatus()!.class">
+            <i [class]="eventTimeStatus()!.icon"></i>
+            <span>{{ eventTimeStatus()!.label }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Statistics Overview -->
+    <div class="stats-overview">
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <div class="stat-icon blue">
+            <i class="fas fa-ticket-alt"></i>
+          </div>
+        </div>
+        <div class="stat-label">Tổng vé đã bán</div>
+        <div class="stat-value">{{ totalTicketsSold() }}</div>
+        <div class="stat-change">
+          <i class="fas fa-arrow-up"></i> Tổng số vé
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <div class="stat-icon green">
+            <i class="fas fa-money-bill-wave"></i>
+          </div>
+        </div>
+        <div class="stat-label">Doanh thu</div>
+        <div class="stat-value">{{ formatCurrency(totalRevenue()) }}</div>
+        <div class="stat-change"><i class="fas fa-arrow-up"></i> VNĐ</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <div class="stat-icon orange">
+            <i class="fas fa-user-check"></i>
+          </div>
+        </div>
+        <div class="stat-label">Đã check-in</div>
+        <div class="stat-value">{{ totalCheckedIn() }}</div>
+        <div class="stat-change">{{ totalCheckedIn() }} người đã vào sự kiện</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <div class="stat-icon red">
+            <i class="fas fa-hourglass-half"></i>
+          </div>
+        </div>
+        <div class="stat-label">Chưa check-in</div>
+        <div class="stat-value">{{ totalNotCheckedIn() }}</div>
+        <div class="stat-change">Chờ check-in</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button
+        class="tab"
+        [class.active]="isTabActive('orders')"
+        (click)="switchTab('orders')">
+        <i class="fas fa-shopping-cart"></i>
+        Đơn hàng & Vé
+      </button>
+      <button
+        class="tab"
+        [class.active]="isTabActive('checkin')"
+        (click)="switchTab('checkin')">
+        <i class="fas fa-clipboard-check"></i>
+        Check-in
+      </button>
+    </div>
+
+    <!-- Tab Contents - Component được destroy và recreate mỗi khi switch tab -->
+
+    <!-- Orders Tab - Chỉ render khi active, mỗi lần render sẽ gọi lại ngOnInit -->
+    @if (isTabActive('orders')) {
+      <div class="tab-content active">
+        <app-orders-tab [event]="event()!"></app-orders-tab>
+      </div>
+    }
+
+    <!-- Check-in Tab - Chỉ render khi active, mỗi lần render sẽ gọi lại ngOnInit -->
+    @if (isTabActive('checkin')) {
+      <div class="tab-content active">
+        <app-checkin-tab
+          [event]="event()!"
+          (statsUpdated)="updateCheckInStats($event)">
+        </app-checkin-tab>
+      </div>
+    }
+  </div>
+}
+
+<!-- Loading State -->
+@if (loading()) {
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <p>Đang tải thông tin sự kiện...</p>
+  </div>
+}
+
+<!-- Error State -->
+@if (error() && !loading()) {
+  <div class="error-container">
+    <i class="fas fa-exclamation-circle"></i>
+    <p>{{ error() }}</p>
+    <button class="btn btn-primary" (click)="loadEventDetails()">
+      <i class="fas fa-sync-alt"></i>
+      Thử lại
+    </button>
+  </div>
+}

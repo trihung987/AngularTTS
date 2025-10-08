@@ -4,8 +4,8 @@ import {
   AbstractControl,
   AbstractControlOptions,
   FormBuilder,
-  FormControl,
   FormGroup,
+  FormControl,
   NonNullableFormBuilder,
   ReactiveFormsModule,
   ValidationErrors,
@@ -66,15 +66,17 @@ export class RegisterComponent implements OnInit {
             Validators.maxLength(50),
           ],
         ],
+        terms: [false, [Validators.requiredTrue]],
       },
       {
-        // This is the new, type-safe way to provide validators
         validators: this.passwordMatchValidator as (
           control: AbstractControl
         ) => ValidationErrors | null,
-        updateOn: 'submit',
       } as AbstractControlOptions
     );
+
+    // Remove updateOn: 'submit' from the group or override for terms control
+    // This ensures the terms checkbox updates immediately
   }
 
   passwordMatchValidator(form: FormGroup) {
@@ -84,7 +86,6 @@ export class RegisterComponent implements OnInit {
       form.get('retypedPassword')?.setErrors({ passwordMismatch: true });
       return { passwordMismatch: true };
     } else {
-      // Remove the error if matched
       if (form.get('retypedPassword')?.hasError('passwordMismatch')) {
         form.get('retypedPassword')?.setErrors(null);
         form
@@ -135,6 +136,7 @@ export class RegisterComponent implements OnInit {
       retypedPassword: 'Mật khẩu nhập lại',
       email: 'Email',
       fullname: 'Tên đầy đủ',
+      terms: 'Điều khoản sử dụng',
     };
     return displayNames[fieldName] || fieldName;
   }
@@ -144,17 +146,34 @@ export class RegisterComponent implements OnInit {
     return !!(field && field.errors && field.touched);
   }
 
+  get isTermsAccepted(): boolean {
+    const termsControl = this.signUpForm.get('terms');
+    return termsControl ? termsControl.value === true : false;
+  }
+
+  navigateToLogin(): void {
+    this.router.navigate(['/auth/login']);
+  }
+
+  navigateToHome(): void {
+    this.router.navigate(['/']);
+  }
+
   onSubmit() {
     this.submitted = true;
 
+    // Mark all as touched to show validation errors
+    Object.keys(this.signUpForm.controls).forEach((key) => {
+      const control = this.signUpForm.get(key);
+      control?.markAsTouched();
+    });
+
     if (this.signUpForm.invalid) {
-      // Show specific errors for invalid fields
       Object.keys(this.signUpForm.controls).forEach((key) => {
         const control = this.signUpForm.get(key);
         console.log('Control:', key, 'is invalid:', control?.invalid);
         if (control && control.invalid) {
-          console.warn("log invalid  ", key, control.errors)
-          control.markAsTouched();
+          console.warn('log invalid  ', key, control.errors);
         }
       });
       this.toastr.error('Vui lòng sửa các thông tin bên dưới', 'Lỗi đăng ký');
@@ -168,14 +187,13 @@ export class RegisterComponent implements OnInit {
       next: (res) => {
         this.isLoading.set(false);
         this.toastr.success(
-          'Đăng ký thành công',
-          'Bạn có thể đăng nhập ngay bây giờ'
+          'Bạn có thể đăng nhập ngay bây giờ',
+          'Đăng ký thành công'
         );
         console.log('Sign up success', res);
-        // Reset form after successful registration
         this.signUpForm.reset();
         this.submitted = false;
-        this.router.navigate(['/login']);
+        this.router.navigate(['/auth/login']);
       },
       error: (err) => {
         this.isLoading.set(false);
