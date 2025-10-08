@@ -127,6 +127,18 @@ export class CreateEventService {
     );
   }
 
+  getEventDetailsById(id: string): Observable<Events> {
+    return this.httpService.get<Events>(`/events/${id}`).pipe(
+      tap((event) => {
+        console.log('event detail:', event);
+      }),
+      catchError((error) => {
+        console.error('Error fetching event details by ID', error);
+        return throwError(() => new Error('Không tìm thấy detail của event.'));
+      })
+    );
+  }
+
   private mapResponseToEventData(event: Events): Partial<EventData> {
     return {
       eventName: event.eventName,
@@ -182,7 +194,7 @@ export class CreateEventService {
       eventData.organizer?.logo instanceof File
         ? eventData.organizer.logo
         : null;
-
+    
     const payload: any = JSON.parse(JSON.stringify(eventData));
     const draftId = localStorage.getItem(this.DRAFT_ID_KEY);
     console.log('draftID', draftId);

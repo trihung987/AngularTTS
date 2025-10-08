@@ -1,0 +1,71 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{width: '90vw', maxWidth: '600px'}"
+  [draggable]="false"
+  [resizable]="false"
+  (onHide)="close()">
+
+  <ng-template pTemplate="header">
+    <div class="dialog-header-content">
+      <i class="pi pi-qrcode" style="font-size: 1.5rem; margin-right: 0.5rem;"></i>
+      <span class="font-bold">Quét QR Code Check-in</span>
+    </div>
+  </ng-template>
+
+  <div class="scanner-content">
+    <!-- Scanner Container -->
+    <div class="scanner-container">
+      <!-- Luôn render zxing-scanner để nó tự yêu cầu quyền -->
+      <zxing-scanner
+        *ngIf="true"
+        [formats]="allowedFormats"
+        [device]="currentDevice"
+        (scanSuccess)="onCodeResult($event)"
+        (camerasFound)="onCamerasFound($event)"
+        (permissionResponse)="onHasPermission($event)"
+      ></zxing-scanner>
+
+      <!-- No Permission Message - chỉ hiện khi hasPermission === false -->
+      <p-message
+        *ngIf="hasPermission === false"
+        severity="warn"
+        text="Vui lòng cấp quyền truy cập camera để quét QR code"
+        [style]="{width: '100%', marginTop: '2rem'}">
+      </p-message>
+
+      <!-- Scanning Guide Overlay -->
+      <div class="scan-guide" *ngIf="hasPermission === true">
+        <div class="scan-frame"></div>
+        <p class="scan-instruction">Đặt QR code vào khung hình</p>
+      </div>
+    </div>
+
+    <!-- Camera Controls -->
+    <div class="camera-controls" *ngIf="hasDevices && availableDevices.length > 1">
+      <p-button
+        icon="pi pi-refresh"
+        label="Đổi camera"
+        (onClick)="switchCamera()"
+        [outlined]="true">
+      </p-button>
+    </div>
+
+    <!-- Result Display -->
+    <p-message
+      *ngIf="qrResultString"
+      severity="success"
+      [text]="'Đã quét: ' + qrResultString"
+      [style]="{width: '100%', marginTop: '1rem'}">
+    </p-message>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Đóng"
+      icon="pi pi-times"
+      (onClick)="close()"
+      [outlined]="true">
+    </p-button>
+  </ng-template>
+</p-dialog>

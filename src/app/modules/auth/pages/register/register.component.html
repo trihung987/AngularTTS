@@ -1,7 +1,5 @@
 <!-- register.component.html -->
 <div class="register-container">
-  <!-- Toast Notifications -->
-
   <!-- Background Elements -->
   <div class="background-elements">
     <div class="bg-circle bg-circle-1"></div>
@@ -11,6 +9,15 @@
 
   <!-- Main Content -->
   <div class="register-card">
+    <!-- Home Button -->
+    <button type="button" class="home-button" (click)="navigateToHome()" aria-label="Go to home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      <span>Trang chủ</span>
+    </button>
+
     <div class="card-header">
       <div class="logo">
         <div class="logo-icon">
@@ -198,11 +205,36 @@
         </div>
       </div>
 
-      <!-- Submit Button -->
+      <!-- Terms and Conditions -->
+      <div class="terms-section">
+        <div class="terms-checkbox">
+          <input
+            type="checkbox"
+            id="terms"
+            formControlName="terms"
+            class="form-checkbox"
+          />
+          <label for="terms" class="terms-text">
+            Tôi đồng ý với
+            <a href="#" onclick="event.preventDefault(); showTerms()">Các điều khoản dịch vụ</a> và
+            <a href="#" onclick="event.preventDefault(); showPrivacy()">Chính sách bảo mật</a>
+          </label>
+        </div>
+        <div *ngIf="hasFieldError('terms')" class="error-message">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          {{ getFieldError('terms') }}
+        </div>
+      </div>
+
+      <!-- Submit Button - Using async pipe for reactive updates -->
       <button
         type="submit"
         class="submit-btn"
-        [disabled]="isLoading()"
+        [disabled]="isLoading() || !isTermsAccepted"
         [class.loading]="isLoading()"
       >
         <div class="btn-content">
@@ -211,9 +243,12 @@
         </div>
       </button>
 
+
+
       <!-- Footer -->
       <div class="form-footer">
-        <p>Đã có tài khoản? <a href="/login" class="login-link">Đăng nhập ngay</a></p>
+        <p>Đã có tài khoản? <a href="javascript:void(0)" (click)="navigateToLogin()" class="login-link">Đăng nhập ngay</a></p>
       </div>
     </form>
   </div>
+</div>

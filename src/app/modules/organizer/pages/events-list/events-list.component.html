@@ -83,7 +83,7 @@
         (delete)="onEventDelete($event)">
       </app-event-card>
     </div>
-
+    
     <app-events-pagination
       *ngIf="!loading() && events.length > 0"
       [currentPage]="currentPage"

@@ -1,7 +1,7 @@
 // event-layout.component.ts
 import { Component, Inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
 import { CommonModule, isPlatformServer } from '@angular/common';
-import { RouterOutlet, RouterModule, Router } from '@angular/router';
+import { RouterOutlet, RouterModule, Router, NavigationEnd } from '@angular/router';
 import {
   trigger,
   state,
@@ -95,7 +95,7 @@ export class OrganizeLayoutComponent implements OnInit {
     },
     {
       label: 'Thống kê',
-      route: '/organizer/analytics',
+      route: '/organizer/revenue',
       icon: 'bar-chart',
       active: false,
     },
@@ -113,9 +113,13 @@ export class OrganizeLayoutComponent implements OnInit {
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
-    // Initialize observables from the service
     this.isLoggedIn$ = this.authService.isLoggedIn$;
     this.user$ = this.authService.user$;
+    this.router.events.subscribe((event)=>{
+      if (event instanceof NavigationEnd) {
+        this.updateActiveNavItem(event.urlAfterRedirects);
+      }
+    })
   }
 
   async ngOnInit() {
@@ -134,7 +138,6 @@ export class OrganizeLayoutComponent implements OnInit {
           });
       } catch (error) {
         console.error('Failed to reload user on init:', error);
-        // AuthService's reloadUser already handles clearing data on failure
       }
     } else {
       this.isLoading.set(false);

@@ -1,0 +1,135 @@
+<div class="success-container">
+  <!-- Background particles effect -->
+  <div class="particles" *ngIf="paymentStatus() === 'COMPLETED'">
+    <div
+      class="particle"
+      *ngFor="let particle of particles"
+      [style.left.px]="particle.x"
+      [style.top.px]="particle.y"
+      [style.animation-delay.ms]="particle.delay"
+    ></div>
+  </div>
+
+  <!-- Loading state -->
+  <div class="success-content" *ngIf="isValidating()" [@slideIn]="animationState">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+    </div>
+    <h1 class="success-title">Đang xác thực giao dịch...</h1>
+    <p class="success-subtitle">Vui lòng chờ trong giây lát</p>
+  </div>
+
+  <!-- Error state -->
+  <div class="success-content error-content" *ngIf="!isValidating() && (validationError() || paymentStatus() === 'FAILED')" [@slideIn]="animationState">
+    <div class="error-icon" [@checkmark]="animationState">
+      <svg width="80" height="80" viewBox="0 0 100 100">
+        <circle
+          cx="50"
+          cy="50"
+          r="45"
+          fill="none"
+          stroke="#f44336"
+          stroke-width="8"
+        ></circle>
+        <path
+          d="M30 30 L70 70 M70 30 L30 70"
+          fill="none"
+          stroke="#f44336"
+          stroke-width="8"
+          stroke-linecap="round"
+        ></path>
+      </svg>
+    </div>
+
+    <h1 class="error-title fade-in-up-repeat">
+      {{ validationError() || 'Thanh toán thất bại!' }}
+    </h1>
+
+    <p class="success-subtitle fade-in-up-repeat">
+      Giao dịch không thể hoàn tất. Vui lòng thử lại sau.
+    </p>
+
+    <div class="action-buttons fade-in-up-repeat">
+      <button class="btn btn-primary" (click)="goToHome()">
+        <i class="icon-home"></i>
+        Về trang chủ
+      </button>
+    </div>
+  </div>
+
+  <!-- Success state -->
+  <div class="success-content" *ngIf="!isValidating() && paymentStatus() === 'COMPLETED'" [@slideIn]="animationState">
+    <!-- Success icon with animation -->
+    <div class="success-icon" [@checkmark]="animationState">
+      <svg width="80" height="80" viewBox="0 0 100 100">
+        <circle
+          cx="50"
+          cy="50"
+          r="45"
+          fill="none"
+          stroke="#4CAF50"
+          stroke-width="8"
+          stroke-dasharray="283"
+          stroke-dashoffset="283"
+          class="circle-bg"
+        ></circle>
+        <path
+          d="M25 50 L40 65 L75 30"
+          fill="none"
+          stroke="#4CAF50"
+          stroke-width="8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-dasharray="50"
+          stroke-dashoffset="50"
+          class="checkmark"
+        ></path>
+      </svg>
+    </div>
+
+    <!-- Success message -->
+    <h1 class="success-title fade-in-up-repeat">
+      Thanh toán thành công!
+    </h1>
+
+    <p class="success-subtitle fade-in-up-repeat">
+      Cảm ơn bạn đã mua vé. Đơn hàng của bạn đã được xác nhận.
+    </p>
+
+    <!-- Order details card - Simplified -->
+    <div class="order-card fade-in-up-repeat">
+      <div class="order-header">
+        <h3>Chi tiết đơn hàng</h3>
+        <div class="order-id" [@orderIdGlow]="animationState">
+          <span class="label">Mã đơn hàng:</span>
+          <span class="value">{{ orderId() }}</span>
+        </div>
+      </div>
+
+      <div class="order-details">
+        <div class="detail-row total-row">
+          <span class="detail-label">Tổng tiền:</span>
+          <span class="detail-value total-amount">{{
+            formatCurrency(totalAmount() || 0)
+          }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="action-buttons fade-in-up-repeat">
+      <button class="btn btn-outline" (click)="goToHome()">
+        <i class="icon-home"></i>
+        Về trang chủ
+      </button>
+      <button class="btn btn-primary" (click)="goToMyTickets()">
+        <i class="icon-ticket"></i>
+        Vé của tôi
+      </button>
+      <button class="btn btn-success" *ngIf="eventId()" (click)="continueBuyingTickets()">
+        <i class="icon-shopping"></i>
+        Tiếp tục mua vé
+      </button>
+    </div>
+  </div>
+</div>

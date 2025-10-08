@@ -1,0 +1,379 @@
+<div class="container">
+  <div class="header">
+    <h1>🎫 Event Review Dashboard</h1>
+    <p>Quản lý và phê duyệt sự kiện một cách chuyên nghiệp</p>
+  </div>
+
+  <!-- Search and filters -->
+  <div class="search-section">
+    <div class="search-wrapper">
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        (keyup.enter)="onSearch()"
+        placeholder="Tìm kiếm sự kiện..."
+        class="search-input"
+        aria-label="Tìm kiếm sự kiện"
+      />
+      <button class="btn btn-primary" type="button" (click)="onSearch()">
+        🔍 Tìm kiếm
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="isLoading()" class="loading-state">
+    <p>Đang tải...</p>
+  </div>
+
+  <!-- Events grid -->
+  <div class="events" *ngIf="!isLoading() && events.length > 0">
+    <div
+      class="event-card"
+      *ngFor="let event of events"
+      (click)="openDialog(event)"
+      tabindex="0"
+      role="button"
+      aria-label="Xem chi tiết sự kiện"
+    >
+      <div class="event-card-banner">
+        <img
+          aria-label="Event Banner"
+          [src]="getImg(event.eventBanner) || getPlaceholderImage(600, 160, 'Banner tạm')"
+          [alt]="event.eventName || 'Banner sự kiện'"
+        />
+      </div>
+      <div class="event-card-content">
+        <h3>{{ event.eventName }}</h3>
+        <div class="event-meta">
+          <div class="event-meta-item">{{ event.eventCategory || '—' }}</div>
+          <div class="event-meta-item">{{ event.venue?.province || '—' }}</div>
+        </div>
+        <div class="event-description">{{ event.eventDescription }}</div>
+        <div class="event-card-footer">
+          <span class="seats-badge">{{ getTotalSeats(event) }} ghế</span>
+          <button
+            class="btn btn-ghost"
+            type="button"
+            (click)="openDialog(event); $event.stopPropagation()"
+          >
+            Xem chi tiết
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!isLoading() && totalPages > 1" class="pagination">
+    <div class="pagination-controls">
+      <button
+        class="btn btn-ghost"
+        type="button"
+        [disabled]="currentPage === 0"
+        (click)="onPageChange(currentPage - 1)"
+      >
+        ← Trước
+      </button>
+      <span class="page-info">
+        Trang {{ currentPage + 1 }} / {{ totalPages }}
+      </span>
+      <button
+        class="btn btn-ghost"
+        type="button"
+        [disabled]="currentPage >= totalPages - 1"
+        (click)="onPageChange(currentPage + 1)"
+      >
+        Sau →
+      </button>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!isLoading() && events.length === 0" class="empty-state">
+    <h3>Không có sự kiện nào</h3>
+    <p>Không tìm thấy sự kiện cần phê duyệt.</p>
+  </div>
+</div>
+
+<!-- Modal Dialog -->
+<div
+  class="overlay"
+  *ngIf="selectedEvent as ev"
+  [class.active]="isDialogOpen()"
+  role="dialog"
+  [attr.aria-modal]="isDialogOpen() ? 'true' : null"
+>
+  <div class="dialog" role="document">
+    <div class="dialog-header">
+      <div class="dialog-header-left">
+        <img
+          [src]="getImg(ev.organizer.logo) || getPlaceholderImage(40, 40, '')"
+          alt="Organizer Logo"
+        />
+        <div>
+          <h2>{{ ev.eventName }}</h2>
+          <span class="status-badge">{{ ev.eventStatus }}</span>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-close" type="button" (click)="closeDialog()">
+        ✕ Đóng
+      </button>
+    </div>
+
+    <div class="dialog-body">
+      <div class="left-panel">
+        <img
+          [src]="getImg(ev.eventBanner) || getPlaceholderImage(600, 160, 'Banner')"
+          alt="banner"
+          class="event-banner-large"
+        />
+
+        <div class="info-group">
+          <div class="info-label">Tên sự kiện</div>
+          <div class="info-value">{{ ev.eventName }}</div>
+        </div>
+
+        <div class="info-group">
+          <div class="info-label">📅 Thời gian</div>
+          <div class="info-value">{{ getEventDateRange(ev) }}</div>
+        </div>
+
+        <div class="info-group">
+          <div class="info-label">📍 Địa điểm</div>
+          <div class="info-value">{{ getVenueDisplay(ev) }}</div>
+        </div>
+
+        <div class="info-group">
+          <div class="info-label">Danh mục</div>
+          <div class="info-value">{{ ev.eventCategory || '—' }}</div>
+        </div>
+
+        <div class="info-group">
+          <div class="info-label">Cập nhật lần cuối</div>
+          <div class="info-value">{{ formatDate(ev.updatedDate) }}</div>
+        </div>
+
+        <div class="action-buttons">
+          <button class="btn btn-primary" type="button" (click)="approveEvent()">
+            ✓ Phê duyệt
+          </button>
+          <button class="btn btn-danger" type="button" (click)="rejectEvent()">
+            ✕ Từ chối
+          </button>
+        </div>
+
+        <div class="stats-card">
+          <div class="stat-row">
+            <span class="stat-label">Tổng số ghế</span>
+            <span class="stat-value">{{ getTotalSeats(ev) }}</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Doanh thu dự kiến</span>
+            <span class="stat-value">{{ formatCurrency(getTotalRevenue(ev)) }}</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Chủ sở hữu</span>
+            <span class="stat-value">{{ ev.ownerName || '—' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-panel">
+        <div class="tabs" role="tablist" aria-label="Event detail tabs">
+          <button
+            id="tab-info"
+            type="button"
+            role="tab"
+            class="tab"
+            [class.active]="activeTab === 'info'"
+            [attr.aria-selected]="activeTab === 'info'"
+            aria-controls="panel-info"
+            (click)="switchTab('info')"
+          >
+            📋 Thông tin
+          </button>
+          <button
+            id="tab-zones"
+            aria-label="Zones Tab"
+            type="button"
+            role="tab"
+            class="tab"
+            [class.active]="activeTab === 'zones'"
+            [attr.aria-selected]="activeTab === 'zones'"
+            aria-controls="panel-zones"
+            (click)="switchTab('zones')"
+          >
+            🎭 Zones
+          </button>
+          <button
+            id="tab-bank"
+            type="button"
+            role="tab"
+            class="tab"
+            [class.active]="activeTab === 'bank'"
+            [attr.aria-selected]="activeTab === 'bank'"
+            aria-controls="panel-bank"
+            (click)="switchTab('bank')"
+          >
+            🏦 Bank
+          </button>
+        </div>
+
+        <!-- Info Panel -->
+        <div
+          class="tab-panel"
+          id="panel-info"
+          role="tabpanel"
+          aria-labelledby="tab-info"
+          *ngIf="activeTab === 'info'"
+        >
+          <div class="info-group">
+            <div class="info-label">Tên sự kiện</div>
+            <div class="info-value">{{ ev.eventName || '—' }}</div>
+          </div>
+          <div class="info-group">
+            <div class="info-label">Danh mục</div>
+            <div class="info-value">{{ ev.eventCategory || '—' }}</div>
+          </div>
+          <div class="info-group">
+            <div class="info-label">Hình ảnh đại diện</div>
+            <img
+              [src]="getImg(ev.eventImage) || getPlaceholderImage(600, 160, 'Event Image')"
+              alt="Event Image"
+              class="event-image-preview"
+            />
+          </div>
+          <div class="info-group">
+            <div class="info-label">Banner sự kiện</div>
+            <img
+              [src]="getImg(ev.eventBanner) || getPlaceholderImage(600, 160, 'Banner')"
+              alt="Event Banner"
+              class="event-image-preview event-banner-preview"
+            />
+          </div>
+          <div class="info-group">
+            <div class="info-label">Mô tả</div>
+            <div class="info-value">{{ ev.eventDescription || '—' }}</div>
+          </div>
+          <div class="info-group">
+            <div class="info-label">Tổ chức</div>
+            <div class="info-value">{{ getOrganizerDisplay(ev) }}</div>
+          </div>
+          <div class="info-group">
+            <div class="info-label">Địa điểm</div>
+            <div class="info-value">{{ getVenueDisplay(ev) }}</div>
+          </div>
+          <div class="info-group">
+            <div class="info-label">Thời gian</div>
+            <div class="info-value">{{ getEventDateRange(ev) }}</div>
+          </div>
+          <div class="info-group">
+            <div class="info-label">Timezone</div>
+            <div class="info-value">{{ ev.timezone || '—' }}</div>
+          </div>
+          <div class="info-group">
+            <div class="info-label">Cập nhật lần cuối</div>
+            <div class="info-value">{{ formatDate(ev.updatedDate) }}</div>
+          </div>
+        </div>
+
+        <!-- Zones Panel -->
+        <div
+          class="tab-panel"
+          id="panel-zones"
+          role="tabpanel"
+          aria-labelledby="tab-zones"
+          *ngIf="activeTab === 'zones'"
+        >
+          <div class="zone-grid" *ngIf="ev.zones && ev.zones.length > 0; else noZones">
+            <div class="zone-card" *ngFor="let zone of ev.zones">
+              <div class="zone-card-left">
+                <div class="zone-color-box" [style.background]="zone.color"></div>
+                <div class="zone-info">
+                  <h4>{{ zone.name }}</h4>
+                  <div class="zone-meta">
+                    Giá: {{ formatCurrency(zone.price) }}<br />
+                    {{ zone.isSeatingZone ? 'Có chỗ ngồi' : 'Không có chỗ ngồi' }}<br />
+                    {{ zone.isSellable ? 'Có thể bán' : 'Không thể bán' }}
+                  </div>
+                </div>
+              </div>
+              <div class="zone-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill" [style.width.%]="getZoneProgress(zone)"></div>
+                </div>
+                <div class="zone-meta">{{ zone.soldTickets || 0 }}/{{ zone.maxTickets || 0 }} vé</div>
+              </div>
+            </div>
+          </div>
+          <ng-template #noZones>
+            <div class="empty-zones">Không có zone nào</div>
+          </ng-template>
+
+          <div class="seating-map" *ngIf="ev.zones && ev.zones.length > 0">
+            <div class="svg-container">
+              <!-- Canvas-based seating map -->
+              <canvas #reviewCanvas style="width: 100%; height: 280px;"></canvas>
+            </div>
+            <div class="legend-panel">
+              <div class="legend-title">🎨 Legend</div>
+              <div class="legend-item" *ngFor="let zone of ev.zones">
+                <div class="legend-color" [style.background]="zone.color"></div>
+                <span>{{ zone.name }}</span>
+              </div>
+              <div class="legend-hint">
+                💡 Click vào zone trên bản đồ để xem chi tiết
+              </div>
+              <div class="zone-detail-box" *ngIf="selectedZone">
+                <h4>{{ selectedZone.name }}</h4>
+                <div class="zone-meta">
+                  Mô tả: {{ selectedZone.description || '—' }}<br />
+                  Giá: {{ formatCurrency(selectedZone.price) }}<br />
+                  {{ selectedZone.soldTickets || 0 }}/{{ selectedZone.maxTickets || 0 }} vé đã bán<br />
+                  {{ selectedZone.isSeatingZone ? 'Có chỗ ngồi' : 'Không có chỗ ngồi' }}<br />
+                  {{ selectedZone.isSellable ? 'Có thể bán' : 'Không thể bán' }}<br />
+                  Xoay: {{ selectedZone.rotation || 0 }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bank Panel -->
+        <div
+          class="tab-panel"
+          id="panel-bank"
+          role="tabpanel"
+          aria-labelledby="tab-bank"
+          *ngIf="activeTab === 'bank'"
+        >
+          <div class="info-group">
+            <div class="info-label">Chủ tài khoản</div>
+            <div class="info-value">{{ ev.bankInfo?.accountHolder || '—' }}</div>
+          </div>
+          <div class="info-group">
+            <div class="info-label">Số tài khoản</div>
+            <div class="info-value">{{ ev.bankInfo?.accountNumber || '—' }}</div>
+          </div>
+          <div class="info-group">
+            <div class="info-label">Ngân hàng</div>
+            <div class="info-value">{{ ev.bankInfo?.bankName || '—' }}</div>
+          </div>
+          <div class="info-group">
+            <div class="info-label">Chi nhánh</div>
+            <div class="info-value">{{ ev.bankInfo?.bankBranch || '—' }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dialog-footer">
+      <button class="btn btn-ghost" type="button" (click)="closeDialog()">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- PrimeNG Confirm Dialogs -->
+<p-confirmDialog key="approveEvent"></p-confirmDialog>
+<p-confirmDialog key="rejectEvent"></p-confirmDialog>

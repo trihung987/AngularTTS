@@ -22,11 +22,12 @@ import {
   CreateEventService,
   EventData,
 } from '../../../services/events.service';
+import { RequiredComponent } from "../../../../../shared/components/required/required.component";
 
 @Component({
   selector: 'step1-info',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RequiredComponent],
   templateUrl: './step1-info.component.html',
   styleUrls: ['./step1-info.component.css'],
   animations: [
@@ -109,7 +110,7 @@ export class Step1InfoComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  private loadInitialData() {
+  public loadInitialData() {
     const savedData = this.createEventService.getCurrentEventData();
     console.log("step 1 data: ",savedData)
     if (savedData) {

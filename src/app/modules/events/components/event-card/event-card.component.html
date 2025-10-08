@@ -1,71 +1,84 @@
-<p-card styleClass="event-card">
-      <!-- Card Header with Image -->
-      <ng-template pTemplate="header">
-        <div class="event-image-container">
-          <img
-            alt=""
-            [src]="getEventImage()"
-            [alt]="event.eventName"
-            (error)="onImageError($event)"
-            class="event-image">
+<div class="event-card"
+     [class.event-soon]="isEventSoon()"
+     [class.event-today]="isEventToday()"
+     (click)="onCardClick()">
 
-          <!-- Category Tag -->
-          <p-tag
-            [value]="event.eventCategory"
-            severity="info"
-            styleClass="category-tag">
-          </p-tag>
+  <!-- Event Image Section -->
+  <div class="event-image">
+    <img
 
-          <!-- Status Tag -->
-          <p-tag
-            [value]="getStatusText()"
-            [severity]="getStatusSeverity()"
-            styleClass="status-tag">
-          </p-tag>
-        </div>
-      </ng-template>
+      [src]="getEventImage()"
+      alt="event.eventName"
+      (error)="onImageError($event)"
+      loading="lazy"
+    />
 
-      <!-- Card Content -->
-      <div class="event-content">
-        <h3 class="event-title">{{ event.eventName }}</h3>
+    <!-- Category Badge -->
+    <div class="event-category">
+      {{ getCategoryDisplayName() }}
+    </div>
 
-        <div class="event-info">
-          <div class="info-row">
-            <i class="pi pi-calendar text-primary"></i>
-            <span>{{ formatDateTime(event.startDate, event.startTime) }}</span>
-          </div>
+    <!-- Status Badge - Moved to top right -->
+    <div class="event-status" [ngClass]="getStatusClass()">
+      {{ getStatusText() }}
+    </div>
 
-          <div class="info-row">
-            <i class="pi pi-map-marker text-primary"></i>
-            <span>{{ event.venue.address }}, {{ event.venue.province }}</span>
-          </div>
+    <!-- Soon Badge -->
+    <div class="event-soon-badge" *ngIf="isEventSoon()">
+      <svg class="clock-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10"></circle>
+        <polyline points="12,6 12,12 16,14"></polyline>
+      </svg>
+      Sắp diễn ra
+    </div>
+  </div>
 
-          <div class="info-row">
-            <i class="pi pi-users text-primary"></i>
-            <span>{{ getAvailableSeats() }}/{{ getTotalSeats() }} chỗ trống</span>
-          </div>
+  <!-- Event Details Section -->
+  <div class="event-details">
+    <h3 class="event-title" [title]="event.eventName">
+      {{event.eventName}}
+    </h3>
 
-          <div class="info-row">
-            <i class="pi pi-user text-primary"></i>
-            <span>{{ event.organizer.name }}</span>
-          </div>
-        </div>
+    <!-- Event Info -->
+    <div class="event-info">
+      <!-- Date & Time -->
+      <div class="info-item">
+        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        <span>{{ formatDateTime(event.startDate, event.startTime) }}</span>
       </div>
 
-      <!-- Card Footer -->
-      <ng-template pTemplate="footer">
-        <div class="event-footer">
-          <div class="price-section">
-            <span class="price">{{ formatPrice() }}</span>
-          </div>
+      <!-- Location -->
+      <div class="info-item">
+        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        <span [title]="getFullAddress()">{{ getShortAddress() }}</span>
+      </div>
 
-          <p-button
-            [label]="getButtonText()"
-            icon="pi pi-arrow-right"
-            styleClass="book-button"
-            [disabled]="isBookingDisabled()"
-            (click)="onBookEvent()">
-          </p-button>
-        </div>
-      </ng-template>
-    </p-card>
+      <!-- Attendees -->
+      <div class="info-item" *ngIf="getTotalSeats() > 0">
+        <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+        <span>{{ getAttendeeText() }}</span>
+      </div>
+    </div>
+
+    <!-- Event Footer -->
+    <div class="event-footer">
+      <div class="event-price">
+       {{minPriceZone(event)}}
+      </div>
+    </div>
+  </div>
+
+  <!-- Event Overlay for interaction feedback -->
+  <div class="event-overlay"></div>
+</div>

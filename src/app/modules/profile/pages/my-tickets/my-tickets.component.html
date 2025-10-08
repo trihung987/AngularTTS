@@ -1,0 +1,284 @@
+<div class="my-tickets-container">
+  <div class="tickets-header">
+    <h1>
+      <i class="pi pi-ticket"></i>
+      Vé của tôi
+    </h1>
+  </div>
+
+  <div *ngIf="isLoading()" class="loading-container">
+    <p-skeleton height="4rem" styleClass="mb-3"></p-skeleton>
+    <p-skeleton height="3rem" styleClass="mb-2" *ngFor="let item of [1,2,3,4,5]"></p-skeleton>
+  </div>
+
+  <div *ngIf="!isLoading() && orders.length === 0" class="empty-state">
+    <i class="pi pi-ticket empty-icon"></i>
+    <h3>Chưa có vé nào</h3>
+    <p>Bạn chưa đặt vé cho sự kiện nào. Hãy khám phá các sự kiện thú vị!</p>
+  </div>
+
+  <div *ngIf="!isLoading() && orders.length > 0" class="tickets-table-container">
+    <p-table
+      [value]="orders"
+      styleClass="p-datatable-lg tickets-table"
+      [sortMode]="'single'"
+      (sortFunction)="onSort($event)">
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 30%">Sự kiện</th>
+          <th style="width: 12%">Khu vực</th>
+          <th style="width: 10%">Số lượng</th>
+          <th style="width: 15%" pSortableColumn="createdAt">
+            Ngày đặt
+            <p-sortIcon field="createdAt"></p-sortIcon>
+          </th>
+          <th style="width: 12%" pSortableColumn="totalAmount">
+            Tổng tiền
+            <p-sortIcon field="totalAmount"></p-sortIcon>
+          </th>
+          <th style="width: 10%">Trạng thái</th>
+          <th style="width: 11%">Hành động</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-order>
+        <tr class="ticket-row">
+          <td>
+            <div class="event-info">
+              <div class="event-icon">
+                <i class="pi pi-calendar"></i>
+              </div>
+              <div class="event-details">
+                <h3>{{ order.nameEvent }}</h3>
+              </div>
+            </div>
+          </td>
+
+          <td>
+            <span class="zone-badge">{{ order.nameZone }}</span>
+          </td>
+
+          <td>
+            <div class="quantity-badge">
+              <i class="pi pi-ticket"></i>
+              <span>{{ order.quantity }}</span>
+            </div>
+          </td>
+
+          <td>
+            <div class="date-info">
+              <div class="date-text">{{ formatDate(order.createdAt) }}</div>
+              <div class="time-text">{{ formatTime(order.createdAt) }}</div>
+            </div>
+          </td>
+
+          <td>
+            <div class="price">{{ formatCurrency(order.totalAmount) }}</div>
+          </td>
+
+          <td>
+            <p-tag
+              [value]="getEventStatusLabel(getEventStatus(order.createdAt))"
+              [severity]="getStatusSeverity(getEventStatus(order.createdAt))"
+              styleClass="status-tag">
+            </p-tag>
+          </td>
+
+          <td>
+            <p-button
+              label="Xem vé"
+              icon="pi pi-eye"
+              (click)="onViewTicket(order)"
+              styleClass="p-button-sm p-button-outlined view-ticket-btn"
+              size="small">
+            </p-button>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7" class="text-center">
+            <div class="empty-state-inline">
+              <i class="pi pi-ticket"></i>
+              <p>Không tìm thấy vé nào</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <div class="pagination-container" *ngIf="!isLoading() && totalPages > 1">
+    <p-paginator
+      [rows]="pageSize"
+      [totalRecords]="totalElements"
+      [rowsPerPageOptions]="[5, 10, 20, 50]"
+      [first]="currentPage * pageSize"
+      (onPageChange)="onPageChange($event)"
+      styleClass="custom-paginator">
+    </p-paginator>
+  </div>
+
+  <!-- TICKET DIALOG -->
+  <p-dialog
+    [(visible)]="displayTicketDialog"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [closable]="true"
+    styleClass="ticket-dialog"
+    [style]="{ width: '600px' }">
+
+    <ng-template pTemplate="header">
+      <div class="dialog-header">
+        <i class="pi pi-ticket"></i>
+        <span>Chi tiết vé</span>
+      </div>
+    </ng-template>
+
+    <div class="ticket-dialog-content">
+      <div *ngIf="loadingCheckIns" class="loading-tickets">
+        <p-skeleton height="400px"></p-skeleton>
+      </div>
+
+      <div *ngIf="!loadingCheckIns && checkIns.length === 0" class="no-tickets">
+        <i class="pi pi-exclamation-circle"></i>
+        <p>Không có vé nào</p>
+      </div>
+
+      <div *ngIf="!loadingCheckIns && currentCheckIn" class="ticket-view" id="ticket-content">
+        <div class="ticket-card">
+          <!-- Header -->
+          <div class="ticket-header">
+            <div class="ticket-pattern"></div>
+            <h2>{{ selectedOrder?.nameEvent }}</h2>
+            <p class="event-zone">
+              <i class="pi pi-map-marker"></i>
+              {{ currentCheckIn.zoneName }}
+            </p>
+          </div>
+
+          <!-- QR Code Section -->
+          <div class="ticket-qr-section">
+            <div class="qr-code-wrapper">
+              <qrcode
+                [qrdata]="currentCheckIn.checkInCode"
+                [width]="200"
+                [errorCorrectionLevel]="'M'"
+                [colorDark]="'#1a202c'"
+                [colorLight]="'#ffffff'">
+              </qrcode>
+            </div>
+            <div class="check-in-code">
+              <strong>Mã check-in:</strong>
+              <span>{{ currentCheckIn.checkInCode }}</span>
+            </div>
+          </div>
+
+          <!-- Ticket Info -->
+          <div class="ticket-info-section">
+            <div class="info-row">
+              <div class="info-item">
+                <i class="pi pi-user"></i>
+                <div>
+                  <label>Người đặt</label>
+                  <p>{{ currentCheckIn.buyerName }}</p>
+                </div>
+              </div>
+              <div class="info-item">
+                <i class="pi pi-envelope"></i>
+                <div>
+                  <label>Email</label>
+                  <p>{{ currentCheckIn.buyerEmail }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="info-row">
+              <div class="info-item">
+                <i class="pi pi-calendar"></i>
+                <div>
+                  <label>Ngày tạo</label>
+                  <p>{{ formatDateTime(currentCheckIn.createdDate) }}</p>
+                </div>
+              </div>
+              <div class="info-item">
+                <i class="pi pi-info-circle"></i>
+                <div>
+                  <label>Trạng thái</label>
+                  <span [class]="'status-badge ' + getStatusBadgeClass(currentCheckIn.status)">
+                    {{ getStatusLabel(currentCheckIn.status) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="info-row" *ngIf="currentCheckIn.checkInTime">
+              <div class="info-item full-width">
+                <i class="pi pi-clock"></i>
+                <div>
+                  <label>Thời gian check-in</label>
+                  <p>{{ formatDateTime(currentCheckIn.checkInTime) }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Decorative Elements -->
+          <div class="ticket-perforation">
+            <div class="circle left"></div>
+            <div class="dashed-line"></div>
+            <div class="circle right"></div>
+          </div>
+
+          <!-- Footer -->
+          <div class="ticket-footer">
+            <p>Vui lòng xuất trình mã QR này khi check-in</p>
+            <p>Cẩn thận tránh tiết lộ mã check-in của bạn cho người khác.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <div class="dialog-footer">
+        <div class="ticket-navigation">
+          <p-button
+            icon="pi pi-chevron-left"
+            (click)="previousTicket()"
+            [disabled]="!canGoPrevious()"
+            styleClass="p-button-text p-button-rounded nav-btn">
+          </p-button>
+
+          <div class="ticket-counter">
+            <span>{{ currentTicketIndex + 1 }} / {{ checkIns.length }}</span>
+          </div>
+
+          <p-button
+            icon="pi pi-chevron-right"
+            (click)="nextTicket()"
+            [disabled]="!canGoNext()"
+            styleClass="p-button-text p-button-rounded nav-btn">
+          </p-button>
+        </div>
+
+        <div class="action-buttons">
+          <p-button
+            label="Tải xuống"
+            icon="pi pi-download"
+            (click)="downloadTicket()"
+            styleClass="p-button-success download-btn">
+          </p-button>
+          <p-button
+            label="Đóng"
+            icon="pi pi-times"
+            (click)="displayTicketDialog = false"
+            styleClass="p-button-secondary">
+          </p-button>
+        </div>
+      </div>
+    </ng-template>
+  </p-dialog>
+</div>

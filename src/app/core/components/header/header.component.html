@@ -6,8 +6,11 @@
       <div class="nav-links" [class.menu-open]="isMenuOpen">
         <a (click)="redirect('/events')" class="nav-link">Sự kiện</a>
         <a (click)="redirect('/organizer/create-event')" class="nav-link">Tạo sự kiện</a>
-        <a (click)="redirect('/my-tickets')" class="nav-link">Vé của tôi</a>
+        <a (click)="redirect('/profile/my-tickets')" class="nav-link">Vé của tôi</a>
         <a (click)="redirect('/support')" class="nav-link">Hỗ trợ</a>
+        @if(isAdmin() && !isLoading()) {
+          <a (click)="redirect('/admin/event-validate')" class="nav-link">Xét duyệt</a>
+        }
       </div>
 
       @if (isLogin() && !isLoading()) {

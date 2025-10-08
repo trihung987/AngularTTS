@@ -3,11 +3,21 @@
   <p>Đang tải trang...</p>
 </div>
 } -->
-
-<ng-container *ngIf="isBrowser">
-  <!-- component chỉ render ở client -->
+  <!-- Khi SSR gặp route protected thì render fallback khi nào thay localstoravge sang cookie server ssr thì ok -->
+<!--
+<ng-container *ngIf="isBrowser || !isProtectedRoute">
   <router-outlet></router-outlet>
 </ng-container>
+<ng-container *ngIf="!isBrowser && isProtectedRoute">
+  <div>Đang tải...</div>
+</ng-container> -->
+
+
+@if (isBrowser){
+  <router-outlet></router-outlet>
+}
+
+
 <!-- @if (isRouterReady) {
   <router-outlet></router-outlet>
 } @else {

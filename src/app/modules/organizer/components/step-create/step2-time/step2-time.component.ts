@@ -1,4 +1,3 @@
-// steps/step2-time/step2-time.component.ts
 import {
   Component,
   OnInit,
@@ -6,9 +5,10 @@ import {
   Output,
   EventEmitter,
   LOCALE_ID,
+  ViewChild,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { CommonModule, formatDate } from '@angular/common';
+import { FormsModule, NgModel } from '@angular/forms';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 import {
   trigger,
@@ -34,6 +34,70 @@ import localeVi from '@angular/common/locales/vi';
 
 registerLocaleData(localeVi);
 
+import {
+  NativeDateAdapter,
+  MAT_DATE_FORMATS,
+  DateAdapter,
+} from '@angular/material/core';
+import { RequiredComponent } from "../../../../../shared/components/required/required.component";
+
+// Định nghĩa định dạng dùng trong Material
+export const VI_DATE_FORMATS = {
+  parse: {
+    dateInput: 'DD/MM/YYYY',
+  },
+  display: {
+    dateInput: 'DD/MM/YYYY',
+    monthYearLabel: 'MM YYYY',
+    dateA11yLabel: 'DD/MM/YYYY',
+    monthYearA11yLabel: 'MM YYYY',
+  },
+};
+
+// Adapter parse & format dd/MM/yyyy
+export class ViDateAdapter extends NativeDateAdapter {
+  override parse(value: any): Date | null {
+    if (typeof value === 'string' && value.trim()) {
+      const parts = value.split('/');
+      if (parts.length === 3) {
+        const day = +parts[0];
+        const month = +parts[1] - 1;
+        const year = +parts[2];
+        if (
+          !isNaN(day) &&
+          !isNaN(month) &&
+          !isNaN(year) &&
+          year > 100 &&
+          month >= 0 &&
+          month < 12 &&
+          day > 0 &&
+          day <= 31
+        ) {
+          const date = new Date(year, month, day);
+          // Kiểm tra lại tránh 31/02...
+          if (
+            date.getFullYear() === year &&
+            date.getMonth() === month &&
+            date.getDate() === day
+          ) {
+            return date;
+          }
+        }
+      }
+      return null;
+    }
+    return value ? new Date(value) : null;
+  }
+
+  override format(date: Date, displayFormat: any): string {
+    if (!date) return '';
+    const d = String(date.getDate()).padStart(2, '0');
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const y = date.getFullYear();
+    return `${d}/${m}/${y}`;
+  }
+}
+
 @Component({
   selector: 'step2-time',
   standalone: true,
@@ -44,9 +108,14 @@ registerLocaleData(localeVi);
     MatInputModule,
     MatDatepickerModule,
     MatNativeDateModule,
-  ],
+    RequiredComponent
+],
   templateUrl: './step2-time.component.html',
   styleUrls: ['./step2-time.component.css'],
+  providers: [
+    { provide: DateAdapter, useClass: ViDateAdapter },
+    { provide: MAT_DATE_FORMATS, useValue: VI_DATE_FORMATS },
+  ],
   animations: [
     trigger('fadeInUp', [
       transition(':enter', [
@@ -100,10 +169,15 @@ export class Step2TimeComponent implements OnInit, OnDestroy {
   validationErrors: { [key: string]: string } = {};
   dateTimeConflict = false;
 
+  @ViewChild('startDateInput', { read: NgModel }) startDateInput!: NgModel;
+  @ViewChild('endDateInput', { read: NgModel }) endDateInput!: NgModel;
+
   constructor(private createEventService: CreateEventService) {}
 
   ngOnInit() {
     this.loadInitialData();
+    this.minDate = this.startOfDay(new Date());
+    this.maxDate = this.startOfDay(this.maxDate);
     this.setupDataBinding();
     this.setupSlugGeneration();
   }
@@ -113,10 +187,9 @@ export class Step2TimeComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  private loadInitialData() {
+  public loadInitialData() {
     const savedData = this.createEventService.getCurrentEventData();
     if (savedData) {
-      // Directly assign values. No conversion needed as the service uses Date objects.
       this.eventData.startDate = savedData.startDate || null;
       this.eventData.endDate = savedData.endDate || null;
       this.eventData.startTime = savedData.startTime || '';
@@ -139,7 +212,6 @@ export class Step2TimeComponent implements OnInit, OnDestroy {
       .pipe(debounceTime(500), takeUntil(this.destroy$))
       .subscribe(() => {
         this.saveData();
-        //this.validateStep();
       });
     this.onDataChange = () => dataChange$.next();
   }
@@ -163,19 +235,7 @@ export class Step2TimeComponent implements OnInit, OnDestroy {
   }
 
   public onDataChange() {
-    // This will be overridden in setupDataBinding
-  }
-
-  onDateTimeChange() {
-    if (
-      this.eventData.startDate &&
-      this.eventData.endDate &&
-      this.eventData.endDate < this.eventData.startDate
-    ) {
-      this.eventData.endDate = new Date(this.eventData.startDate);
-    }
-    this.validateDateTime();
-    this.onDataChange();
+    // overridden in setupDataBinding
   }
 
   private getFullDateTime(date: Date | null, time: string): Date | null {
@@ -186,19 +246,116 @@ export class Step2TimeComponent implements OnInit, OnDestroy {
     return newDate;
   }
 
-  private validateDateTime() {
-    this.dateTimeConflict = false;
-    const startDateTime = this.getFullDateTime(
-      this.eventData.startDate,
-      this.eventData.startTime
-    );
-    const endDateTime = this.getFullDateTime(
-      this.eventData.endDate,
-      this.eventData.endTime
-    );
+  private startOfDay(d: Date): Date {
+    const nd = new Date(d);
+    nd.setHours(0, 0, 0, 0);
+    return nd;
+  }
 
-    if (startDateTime && endDateTime && endDateTime <= startDateTime) {
-      this.dateTimeConflict = true;
+  onDateTimeChange() {
+    this.validateDateTime();
+    this.onDataChange();
+  }
+
+  // Helpers để tránh lặp thao tác set / delete lỗi
+  private setError(key: string, message: string) {
+    this.validationErrors = {
+      ...this.validationErrors,
+      [key]: message,
+    };
+
+    // Đánh dấu control của startDate | endDate là touched & dirty để show lỗi ngay
+    // vì control này dùng mat của Angular Material nên sẽ không tự rerender khi mà dùng if khi có giá trị thay đổi
+    // Component Angular Material chỉ rerender khi có sự kiện từ người dùng
+    // (kích hoạt khi tương tác với control đó như nhập, thay đổi giá trị thay focus...)
+    // vì vậy cần đánh dấu thủ công là đã tương tác với control đó khi validate từ bấm 1 nút button khác control đó (chẳng hạn nút submit)
+    if (key === 'startDate' && this.startDateInput) {
+      this.startDateInput.control.markAsTouched();
+      this.startDateInput.control.markAsDirty();
+    }
+    if (key === 'endDate' && this.endDateInput) {
+      this.endDateInput.control.markAsTouched();
+      this.endDateInput.control.markAsDirty();
+    }
+  }
+
+  private clearError(key: string) {
+    delete this.validationErrors[key];
+  }
+
+  // Rút gọn & tránh ghi đè lỗi không cần thiết
+  private validateDateTime() {
+    // Xoá các lỗi ngày / thời gian có thể được set lại
+    ['startDate', 'endDate', 'endTime'].forEach((k) => this.clearError(k));
+    this.dateTimeConflict = false;
+
+    const today = this.startOfDay(new Date());
+    const start = this.eventData.startDate
+      ? this.startOfDay(this.eventData.startDate)
+      : null;
+    let end = this.eventData.endDate
+      ? this.startOfDay(this.eventData.endDate)
+      : null;
+    console.log('Validating dates:', start, this.eventData.startDate);
+    // Start date validate
+    if (!start) {
+      this.setError(
+        'startDate',
+        'Ngày bắt đầu là bắt buộc và phải đúng định dạng'
+      );
+    } else {
+      if (start < today) {
+        this.setError('startDate', 'Ngày bắt đầu không được trong quá khứ');
+      } else if (this.maxDate && start > this.startOfDay(this.maxDate)) {
+        this.setError('startDate', 'Ngày bắt đầu vượt quá giới hạn cho phép');
+      }
+    }
+
+    // End date validate
+    if (!end) {
+      this.setError(
+        'endDate',
+        'Ngày kết thúc là bắt buộc và phải đúng định dạng'
+      );
+    } else {
+      if (this.maxDate && end > this.startOfDay(this.maxDate)) {
+        this.setError('endDate', 'Ngày kết thúc vượt quá giới hạn cho phép');
+      }
+    }
+
+    // Auto-correct end < start (chỉ khi cả hai hợp lệ ban đầu)
+    if (
+      start &&
+      end &&
+      end < start &&
+      !this.validationErrors['startDate'] &&
+      !this.validationErrors['endDate']
+    ) {
+      this.eventData.endDate = new Date(start);
+      end = this.startOfDay(this.eventData.endDate);
+    }
+
+    // Kiểm tra xung đột thời gian nếu đủ dữ liệu
+    if (
+      start &&
+      end &&
+      this.eventData.startTime &&
+      this.eventData.endTime &&
+      !this.validationErrors['startDate'] &&
+      !this.validationErrors['endDate']
+    ) {
+      const startDateTime = this.getFullDateTime(
+        start,
+        this.eventData.startTime
+      );
+      const endDateTime = this.getFullDateTime(end, this.eventData.endTime);
+      if (startDateTime && endDateTime && endDateTime <= startDateTime) {
+        this.setError(
+          'endTime',
+          'Thời gian kết thúc phải sau thời gian bắt đầu'
+        );
+        this.dateTimeConflict = true;
+      }
     }
   }
 
@@ -262,53 +419,47 @@ export class Step2TimeComponent implements OnInit, OnDestroy {
   }
 
   public validateStep(fromNext: boolean = true): boolean {
-    this.validationErrors = {};
-    let isValid = true;
-    if (!this.eventData.startDate) {
-      this.validationErrors['startDate'] = 'Ngày bắt đầu là bắt buộc';
-      isValid = false;
-    }
-    if (!this.eventData.endDate) {
-      this.validationErrors['endDate'] = 'Ngày kết thúc là bắt buộc';
-      isValid = false;
-    }
+    this.validateDateTime();
+
+    // Validate giờ (riêng, không xoá lỗi endTime nếu đang conflict do so sánh)
     if (!this.eventData.startTime) {
-      this.validationErrors['startTime'] = 'Giờ bắt đầu là bắt buộc';
-      isValid = false;
+      this.setError('startTime', 'Giờ bắt đầu là bắt buộc');
+    } else {
+      this.clearError('startTime');
     }
+
     if (!this.eventData.endTime) {
-      this.validationErrors['endTime'] = 'Giờ kết thúc là bắt buộc';
-      isValid = false;
+      // Nếu chưa có giờ kết thúc mà chưa bị conflict thì set lỗi required
+      if (!this.dateTimeConflict) {
+        this.setError('endTime', 'Giờ bắt đầu là bắt buộc');
+      }
+    } else {
+      // Chỉ clear khi không có conflict về thời gian
+      if (!this.dateTimeConflict && this.validationErrors['endTime']) {
+        // Nếu lỗi hiện tại là lỗi "kết thúc phải sau bắt đầu" mà vẫn conflict thì giữ
+        if (
+          this.validationErrors['endTime'] !==
+          'Thời gian kết thúc phải sau thời gian bắt đầu'
+        ) {
+          this.clearError('endTime');
+        } else if (!this.dateTimeConflict) {
+          this.clearError('endTime');
+        }
+      } else if (!this.dateTimeConflict) {
+        this.clearError('endTime');
+      }
     }
-    if (this.dateTimeConflict) {
-      this.validationErrors['endTime'] =
-        'Thời gian kết thúc phải sau thời gian bắt đầu';
-      isValid = false;
+
+    const isValid = Object.keys(this.validationErrors).length === 0;
+    console.log('Step 2 validation:', isValid, this.validationErrors);
+
+    if (fromNext) {
+      this.stepComplete.emit(isValid);
     }
-    // if (!this.eventData.slug || this.eventData.slug.trim().length === 0) {
-    //   this.validationErrors['slug'] = 'Đường dẫn sự kiện là bắt buộc';
-    //   isValid = false;
-    // } else if (this.eventData.slug.trim().length < 3) {
-    //   this.validationErrors['slug'] = 'Đường dẫn phải có ít nhất 3 ký tự';
-    //   isValid = false;
-    // } else if (!/^[a-z0-9-]+$/.test(this.eventData.slug)) {
-    //   this.validationErrors['slug'] =
-    //     'Đường dẫn chỉ được chứa chữ thường, số và dấu gạch ngang';
-    //   isValid = false;
-    // } else if (this.slugAvailable === false) {
-    //   this.validationErrors['slug'] = 'Đường dẫn này đã được sử dụng';
-    //   isValid = false;
-    // }
-    // const isStepValid = isValid && this.slugAvailable === true;
-    console.log("step2",isValid)
-    const isStepValid = isValid;
-    if (fromNext) this.stepComplete.emit(isValid);
-    this.stepComplete.emit(isStepValid);
-    return isStepValid;
+    return isValid;
   }
 
   private saveData() {
-    // No conversion needed. The service expects Date objects.
     this.createEventService.updateEventData(this.eventData);
   }
 

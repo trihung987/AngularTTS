@@ -1,6 +1,6 @@
-<div class="container">
+<div class="container" [@fadeInUp]>
   <div class="main-wrapper">
-    <h1 class="main-title">Thiết kế sơ đồ chỗ ngồi</h1>
+    <h1 class="main-title"><line-required label="Thiết kế sơ đồ chỗ ngồi"/> </h1>
 
     <div class="layout-grid">
       <div class="sidebar">
@@ -147,7 +147,7 @@
                       >
                     </p>
                     <p class="zone-price" *ngIf="zone.isSellable">
-                      ${{ zone.price }}
+                      {{ formatCurrency(zone.price) }}
                     </p>
                   </div>
                 </div>
@@ -213,9 +213,9 @@
               <button (click)="showClearConfirmation()" class="btn-secondary">
                 🗑️ Xóa tất cả
               </button>
-              <button (click)="exportLayout()" class="btn-success">
+              <!-- <button (click)="exportLayout()" class="btn-success">
                 💾 Xuất sơ đồ
-              </button>
+              </button> -->
             </div>
           </div>
         </div>
@@ -255,9 +255,7 @@
             <div class="selected-item">
               <strong>Zone đã chọn:</strong> {{ selectedZone.name }}
               <span *ngIf="selectedZone.isSellable"
-                >(Sức chứa: {{ selectedZone.maxTickets || 0 }}, ${{
-                  selectedZone.price
-                }}
+                >(Sức chứa: {{ selectedZone.maxTickets || 0 }}, {{this.formatCurrency(selectedZone.price) }}
                 mỗi vé)</span
               >
               <span *ngIf="!selectedZone.isSellable"> (Trang trí)</span>
@@ -287,7 +285,7 @@
                   <div class="stat-item">Trang trí</div>
                 </ng-template>
                 <div class="stat-item" *ngIf="zone.isSellable">
-                  Tổng: ${{ (zone.maxTickets || 0) * zone.price }}
+                  Tổng: {{ formatCurrency( (zone.maxTickets || 0) * zone.price ) }}
                 </div>
                 <div class="stat-item">
                   Hình: {{ getShapeLabel(zone.shape) }}
@@ -376,7 +374,7 @@
 
           <div *ngIf="editingZone.isSellable">
             <div class="form-group">
-              <label class="form-label">Giá vé ($)</label>
+              <label class="form-label">Giá vé (VNĐ)</label>
               <input
                 aria-label="Price"
                 type="number"

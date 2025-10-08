@@ -2,38 +2,43 @@
   <div class="event-header">
     <div class="header-content">
       <button class="back-button" (click)="saveAndExit(true)">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M19 12H5M12 19l-7-7 7-7" />
         </svg>
         <span>Về trang quản lý</span>
       </button>
 
       <div class="header-info">
         <h1 class="page-title">Tạo sự kiện mới</h1>
-        <p class="page-subtitle">Hoàn thành từng bước để tạo sự kiện hoàn hảo</p>
+        <p class="page-subtitle">
+          Hoàn thành từng bước để tạo sự kiện hoàn hảo
+        </p>
       </div>
 
       <div class="header-actions">
         <button class="save-draft-btn" (click)="saveAndExit()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-            <polyline points="17,21 17,13 7,13 7,21"/>
-            <polyline points="7,3 7,8 15,8"/>
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
+            />
+            <polyline points="17,21 17,13 7,13 7,21" />
+            <polyline points="7,3 7,8 15,8" />
           </svg>
           Lưu nháp
-        </button>
-        <button
-          class="publish-btn"
-          [disabled]="isNotCompleted()"
-          (click)="publishEvent()"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 19l7-7 3 3-7 7-3-3z"/>
-            <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
-            <path d="M2 2l7.586 7.586"/>
-            <circle cx="11" cy="11" r="2"/>
-          </svg>
-          Xuất bản
         </button>
       </div>
     </div>
@@ -44,12 +49,19 @@
       <div
         class="step-progress"
         [style.width.%]="progressPercentage"
-        [@stepProgress]="{ value: progressPercentage, params: { width: progressPercentage } }"
+        [@stepProgress]="{
+          value: progressPercentage,
+          params: { width: progressPercentage }
+        }"
       ></div>
     </div>
     <div class="progress-text">
-      <span class="progress-current">Bước {{ currentStep }} / {{ totalSteps }}</span>
-      <span class="progress-percent">{{ progressPercentage | number:'1.0-0' }}% hoàn thành</span>
+      <span class="progress-current"
+        >Bước {{ currentStep }} / {{ totalSteps }}</span
+      >
+      <span class="progress-percent"
+        >{{ progressPercentage | number : "1.0-0" }}% hoàn thành</span
+      >
     </div>
   </div>
 
@@ -65,28 +77,67 @@
       >
         <div class="step-indicator">
           <div class="step-icon" *ngIf="!step.completed">
-            <svg *ngIf="step.icon === 'info'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="12" y1="16" x2="12" y2="12"/>
-              <line x1="12" y1="8" x2="12.01" y2="8"/>
+            <svg
+              *ngIf="step.icon === 'info'"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="16" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
             </svg>
-            <svg *ngIf="step.icon === 'clock'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <polyline points="12,6 12,12 16,14"/>
+            <svg
+              *ngIf="step.icon === 'clock'"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12,6 12,12 16,14" />
             </svg>
-            <svg *ngIf="step.icon === 'layout'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-              <line x1="9" y1="9" x2="15" y2="9"/>
-              <line x1="9" y1="15" x2="15" y2="15"/>
+            <svg
+              *ngIf="step.icon === 'layout'"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+              <line x1="9" y1="9" x2="15" y2="9" />
+              <line x1="9" y1="15" x2="15" y2="15" />
             </svg>
-            <svg *ngIf="step.icon === 'credit-card'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-              <line x1="1" y1="10" x2="23" y2="10"/>
+            <svg
+              *ngIf="step.icon === 'credit-card'"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+              <line x1="1" y1="10" x2="23" y2="10" />
             </svg>
           </div>
           <div class="step-check" *ngIf="step.completed">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="20,6 9,17 4,12"/>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="20,6 9,17 4,12" />
             </svg>
           </div>
           <div class="step-number">{{ step.id }}</div>
@@ -125,8 +176,6 @@
         *ngIf="currentStep === 4"
         (stepComplete)="onStepComplete(4, $event)"
       ></step4-payment>
-
-
     </div>
   </div>
 
@@ -137,8 +186,15 @@
         [disabled]="currentStep === 1"
         (click)="previousStep()"
       >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M19 12H5M12 19l-7-7 7-7" />
         </svg>
         Quay lại
       </button>
@@ -152,17 +208,52 @@
           (click)="goToStep(step.id)"
         ></div>
       </div>
-
+      @if(currentStep < totalSteps) {
       <button
         class="nav-btn next-btn"
         [disabled]="currentStep === totalSteps"
         (click)="nextStep()"
       >
         Tiếp theo
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M5 12h14M12 5l7 7-7 7"/>
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M5 12h14M12 5l7 7-7 7" />
         </svg>
       </button>
+      }@else{
+      <button
+        class="publish-btn"
+        [disabled]="isNotCompleted()"
+        (click)="publishEvent()"
+      >
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M12 19l7-7 3 3-7 7-3-3z" />
+          <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+          <path d="M2 2l7.586 7.586" />
+          <circle cx="11" cy="11" r="2" />
+        </svg>
+        Xuất bản
+      </button>
+      }
     </div>
   </div>
+  <p-scrolltop
+    target="window"
+    [threshold]="100"
+    icon="pi pi-arrow-up"
+    [buttonProps]="{ severity: 'contrast', raised: true, rounded: true }"
+  />
 </div>

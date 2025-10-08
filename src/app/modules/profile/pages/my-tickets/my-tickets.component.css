@@ -1,0 +1,578 @@
+/* ===== CONTAINER & LAYOUT ===== */
+.my-tickets-container {
+  padding: 2rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  min-height: 100vh;
+}
+
+.my-tickets-container>* {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ===== HEADER SECTION ===== */
+.tickets-header {
+  margin-bottom: 2rem;
+  padding: 1.5rem 2rem;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e2e8f0;
+}
+
+.tickets-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a202c;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.tickets-header h1 i {
+  color: #667eea;
+  font-size: 2rem;
+}
+
+/* ===== TABLE CONTAINER ===== */
+.tickets-table-container {
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+}
+
+/* ===== TABLE STYLES ===== */
+::ng-deep .tickets-table .p-datatable-thead>tr>th {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  border: none;
+  padding: 1.2rem 1.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.8px;
+}
+
+::ng-deep .tickets-table .p-datatable-tbody>tr {
+  border-bottom: 1px solid #f1f5f9;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+::ng-deep .tickets-table .p-datatable-tbody>tr>td {
+  padding: 1.2rem 1.5rem;
+  vertical-align: middle;
+}
+
+::ng-deep .tickets-table .p-datatable-tbody>tr:hover {
+  background: #f8fafc !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== EVENT INFO ===== */
+.event-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.event-icon {
+  width: 50px;
+  height: 50px;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+}
+
+.event-details h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ===== BADGES ===== */
+.zone-badge {
+  background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 20px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  display: inline-block;
+  box-shadow: 0 2px 8px rgba(66, 153, 225, 0.3);
+}
+
+.quantity-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 1rem;
+  box-shadow: 0 2px 8px rgba(72, 187, 120, 0.3);
+}
+
+/* ===== PRICE & DATE ===== */
+.price {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #e53e3e;
+}
+
+.date-info .date-text {
+  font-weight: 600;
+  color: #2d3748;
+  font-size: 0.95rem;
+}
+
+.date-info .time-text {
+  font-size: 0.85rem;
+  color: #718096;
+  margin-top: 0.2rem;
+}
+
+/* ===== STATUS TAGS ===== */
+::ng-deep .status-tag {
+  padding: 0.5rem 1rem !important;
+  border-radius: 15px !important;
+  font-weight: 600 !important;
+  font-size: 0.8rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+
+/* ===== VIEW BUTTON ===== */
+::ng-deep .view-ticket-btn {
+  background: transparent !important;
+  border: 2px solid #667eea !important;
+  color: #667eea !important;
+  padding: 0.6rem 1.2rem !important;
+  border-radius: 10px !important;
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
+}
+
+::ng-deep .view-ticket-btn:hover {
+  background: #667eea !important;
+  color: white !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4) !important;
+}
+
+/* ===== TICKET DIALOG ===== */
+::ng-deep .ticket-dialog {
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+::ng-deep .ticket-dialog .p-dialog-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1.5rem 2rem;
+  border-radius: 0;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.dialog-header i {
+  font-size: 1.5rem;
+}
+
+::ng-deep .ticket-dialog .p-dialog-content {
+  padding: 0;
+  background: #f8fafc;
+}
+
+.ticket-dialog-content {
+  min-height: 500px;
+  padding: 2rem;
+}
+
+/* ===== TICKET CARD ===== */
+.ticket-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.ticket-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  line-height: 2.2rem;
+}
+
+.ticket-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: repeating-linear-gradient(45deg,
+      transparent,
+      transparent 10px,
+      rgba(255, 255, 255, 0.05) 10px,
+      rgba(255, 255, 255, 0.05) 20px);
+}
+
+.ticket-header h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  position: relative;
+  z-index: 1;
+}
+
+.event-zone {
+  margin: 0;
+  font-size: 1.1rem;
+  opacity: 0.95;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== QR CODE SECTION ===== */
+.ticket-qr-section {
+  padding: 2rem;
+  text-align: center;
+  background: white;
+}
+
+.qr-code-wrapper {
+  display: inline-block;
+  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+}
+
+.check-in-code {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f7fafc;
+  border-radius: 10px;
+  border: 2px dashed #cbd5e0;
+}
+
+.check-in-code strong {
+  display: block;
+  color: #4a5568;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.check-in-code span {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #2d3748;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 2px;
+}
+
+/* ===== TICKET INFO ===== */
+.ticket-info-section {
+  padding: 1.5rem 2rem;
+  background: #fafafa;
+}
+
+.info-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.info-row:last-child {
+  margin-bottom: 0;
+}
+
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.info-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.info-item i {
+  color: #667eea;
+  font-size: 1.2rem;
+  margin-top: 0.2rem;
+}
+
+.info-item label {
+  display: block;
+  font-size: 0.8rem;
+  color: #718096;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-item p {
+  margin: 0;
+  font-size: 1rem;
+  color: #2d3748;
+  font-weight: 500;
+}
+
+.status-badge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-checked-in {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-cancelled {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* ===== PERFORATION ===== */
+.ticket-perforation {
+  position: relative;
+  height: 30px;
+  background: #fafafa;
+}
+
+.dashed-line {
+  position: absolute;
+  top: 50%;
+  left: 40px;
+  right: 40px;
+  border-top: 2px dashed #cbd5e0;
+  transform: translateY(-50%);
+}
+
+.circle {
+  position: absolute;
+  top: 50%;
+  width: 30px;
+  height: 30px;
+  background: #f8fafc;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.circle.left {
+  left: -15px;
+}
+
+.circle.right {
+  right: -15px;
+}
+
+/* ===== TICKET FOOTER ===== */
+.ticket-footer {
+  padding: 1.5rem 2rem;
+  background: white;
+  text-align: center;
+  border-top: 1px solid #e2e8f0;
+}
+
+.ticket-footer p {
+  margin: 0;
+  color: #718096;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+/* ===== DIALOG FOOTER ===== */
+::ng-deep .ticket-dialog .p-dialog-footer {
+  padding: 1.5rem 2rem;
+  background: white;
+  border-top: 2px solid #e2e8f0;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.ticket-navigation {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ticket-counter {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2d3748;
+  min-width: 80px;
+  text-align: center;
+}
+
+::ng-deep .nav-btn {
+  width: 40px;
+  height: 40px;
+  color: #667eea !important;
+}
+
+::ng-deep .nav-btn:disabled {
+  opacity: 0.3;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+::ng-deep .download-btn {
+  background: #48bb78 !important;
+  border-color: #48bb78 !important;
+}
+
+/* ===== LOADING & EMPTY STATES ===== */
+.loading-tickets {
+  padding: 2rem;
+}
+
+.no-tickets {
+  text-align: center;
+  padding: 3rem 2rem;
+}
+
+.no-tickets i {
+  font-size: 4rem;
+  color: #cbd5e0;
+  margin-bottom: 1rem;
+}
+
+.no-tickets p {
+  font-size: 1.1rem;
+  color: #718096;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.empty-state i {
+  font-size: 5rem;
+  color: #cbd5e0;
+  margin-bottom: 1.5rem;
+}
+
+.empty-state h3 {
+  font-size: 1.5rem;
+  color: #4a5568;
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  color: #718096;
+  font-size: 1rem;
+}
+
+/* ===== PAGINATION ===== */
+.pagination-container {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e2e8f0;
+}
+
+::ng-deep .p-paginator {
+  background: white;
+  border: none;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .my-tickets-container {
+    padding: 1rem;
+  }
+
+  .tickets-header h1 {
+    font-size: 1.5rem;
+  }
+
+  ::ng-deep .ticket-dialog {
+    width: 95vw !important;
+    max-width: 95vw !important;
+  }
+
+  .ticket-dialog-content {
+    padding: 1rem;
+  }
+
+  .info-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .dialog-footer {
+    flex-direction: column;
+  }
+
+  .ticket-navigation,
+  .action-buttons {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ===== LOADING SKELETON ===== */
+::ng-deep .p-skeleton {
+  border-radius: 10px;
+}

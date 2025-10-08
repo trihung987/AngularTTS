@@ -17,7 +17,9 @@ export interface Zone {
     points?: { x: number; y: number }[];
   };
   maxTickets?: number;
+  soldTickets?: number;
   isSeatingZone?: boolean;
   description?: string;
-  rotation: number; // <-- NEW: Add rotation property (in radians)
+  rotation: number;
 }
+

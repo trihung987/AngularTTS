@@ -6,6 +6,15 @@
   </div>
 
   <div class="login-container">
+    <!-- Home Button -->
+    <button type="button" class="home-button" (click)="navigateToHome()" aria-label="Go to home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      <span>Trang chủ</span>
+    </button>
+
     <div class="logo-section">
       <div class="logo">✦</div>
       <h1 class="welcome-text">Welcome Back</h1>
@@ -78,35 +87,6 @@
         <a href="#" onclick="showForgotPassword()">Quên mật khẩu?</a>
       </div>
 
-      <div class="terms-section">
-        <div class="terms-checkbox">
-          <input
-            type="checkbox"
-            id="terms"
-            formControlName="terms"
-            class="form-checkbox"
-            [class.loading]="isLoading()"
-          />
-          <label for="terms" class="terms-text">
-            Tôi đồng ý với
-            <a href="#" onclick="showTerms()">Các điều khoản dịch vụ</a> và
-            <a href="#" onclick="showPrivacy()">Chính sách bảo mật</a>
-          </label>
-        </div>
-        <div *ngIf="hasFieldError('terms')" class="error-message">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="8" x2="12" y2="12"></line>
-            <line x1="12" y1="16" x2="12.01" y2="16"></line>
-          </svg>
-          {{ getFieldError("terms") }}
-        </div>
-      </div>
       <div class="error-response" id="errorResponse">
         {{ loginError }}
       </div>
@@ -115,7 +95,6 @@
         type="submit"
         class="login-button"
         id="loginBtn"
-
         [class.loading]="isLoading()"
       >
         <div class="btn-content">
@@ -123,6 +102,16 @@
           <span>{{ isLoading() ? "Đang đăng nhập..." : "Đăng nhập" }}</span>
         </div>
       </button>
+
+      <!-- Register Link -->
+      <div class="register-section">
+        <p>
+          Chưa có tài khoản?
+          <a href="javascript:void(0)" (click)="navigateToRegister()" class="register-link">
+            Đăng ký ngay
+          </a>
+        </p>
+      </div>
     </form>
   </div>
 </div>

@@ -1,0 +1,115 @@
+<div class="account-settings-container">
+  <h1>Thông tin tài khoản</h1>
+
+  <form class="account-form" (ngSubmit)="onSaveChanges()" *ngIf="user">
+    <div class="avatar-uploader">
+      <!-- Nếu có avatarUrl thì dùng -->
+      <ng-container *ngIf="user.avatarUrl; else noAvatar">
+        <img [src]="user.avatarUrl" alt="User Avatar" />
+      </ng-container>
+
+      <!-- Nếu không có avatarUrl -->
+      <ng-template #noAvatar>
+        <div class="profile-initials">
+          <span>{{ getInitials(user.fullName || "U") }}</span>
+        </div>
+      </ng-template>
+
+      <!-- Icon upload -->
+      <label for="avatar-upload" class="upload-icon">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </label>
+      <input
+        id="avatar-upload"
+        type="file"
+        accept="image/*"
+        (change)="onAvatarChange($event)"
+        style="display: none"
+      />
+    </div>
+
+    <p class="form-description">
+      Ảnh đại diện của bạn. Các tệp được hỗ trợ: .png, .jpg, .jpeg
+    </p>
+
+    <div class="form-group">
+      <label for="fullName">Họ và tên</label>
+      <input
+        id="fullName"
+        type="text"
+        [(ngModel)]="editForm.fullName"
+        [readonly]="!isEditing"
+        name="fullName"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email</label>
+      <div class="input-with-icon">
+        <input
+          id="email"
+          type="email"
+          [(ngModel)]="editForm.email"
+          [readonly]="!isEditing"
+          name="email"
+        />
+        <svg
+          class="verified-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          style="fill: currentColor"
+        >
+          <path
+            d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,20a9,9,0,1,1,9-9A9,9,0,0,1,12,21Zm4.71-12.71L11,14,8.29,11.29a1,1,0,0,0-1.41,1.41l3.41,3.42a1,1,0,0,0,1.41,0l6.42-6.42a1,1,0,0,0-1.42-1.41Z"
+          ></path>
+        </svg>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="username">Tên đăng nhập</label>
+      <input
+        id="username"
+        type="text"
+        [value]="user.username"
+        readonly
+        name="username"
+        class="readonly-input"
+      />
+    </div>
+
+    <div class="form-actions">
+      <ng-container *ngIf="!isEditing">
+        <button type="button" class="btn btn-primary" (click)="onEditToggle()">
+          Chỉnh sửa thông tin
+        </button>
+      </ng-container>
+
+      <ng-container *ngIf="isEditing">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="onEditToggle()"
+        >
+          Hủy
+        </button>
+        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+      </ng-container>
+    </div>
+  </form>
+</div>

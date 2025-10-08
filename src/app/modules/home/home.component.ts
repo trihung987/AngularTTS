@@ -1,154 +1,299 @@
 import { AuthService } from './../auth/services/auth.service';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewEncapsulation,
+  OnDestroy,
+  signal,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { StorageWrapperService } from '../../shared/services/storage-wrapper.service';
 
-interface Event {
-  id: number;
-  title: string;
-  date: string;
-  location: string;
-  price: string;
-  image: string;
-  attendees: number;
-  rating: number;
-  category: string;
-}
+import { Events } from '../../shared/models/event.model';
+import {
+  EventsListParams,
+  EventsListResponse,
+} from '../../shared/models/events-list.model';
+import { Subject, interval, takeUntil, filter } from 'rxjs';
 
+// PrimeNG Imports
+import { CarouselModule } from 'primeng/carousel';
+import { ButtonModule } from 'primeng/button';
+import { TagModule } from 'primeng/tag';
+import { SkeletonModule } from 'primeng/skeleton';
+import { CreateEventService } from '../organizer/services/events.service';
+import { EventService } from '../events/services/event-list.service';
+import { ScrollTopModule, ScrollTop } from 'primeng/scrolltop';
+
+// Interface đã được cập nhật, loại bỏ thuộc tính 'icon'
 interface Feature {
-  icon: string;
   title: string;
   description: string;
 }
 
+// Thêm interface cho category để code chặt chẽ hơn
+interface Category {
+  name: string;
+  icon: string;
+  gradient: string;
+}
+
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, FormsModule, RouterModule, NgOptimizedImage],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    CarouselModule,
+    ButtonModule,
+    TagModule,
+    SkeletonModule,
+    ScrollTop,
+  ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
-  encapsulation: ViewEncapsulation.Emulated //Phạm vi áp dụng của css - emulated = chỉ host component, None = toàn cục
 })
-export class HomeComponent implements OnInit{
-  constructor(private authSerice: AuthService){
-  }
+export class HomeComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
+  constructor(
+    private authService: AuthService,
+    private eventService: EventService,
+    private createEventService: CreateEventService,
+    private router: Router
+  ) {}
+
   ngOnInit(): void {
-
+    this.loadFeaturedEvents();
+    this.loadLargeCapacityEvents();
+    this.loadEventCategories();
+    this.startBannerRotation();
   }
-  searchQuery = '';
 
-  featuredEvents: Event[] = [
-    {
-      id: 1,
-      title: 'Tech Conference Vietnam 2025',
-      date: '2025-09-15',
-      location: 'TP. Hồ Chí Minh',
-      price: '500,000 VND',
-      image:
-        'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&h=250&fit=crop',
-      attendees: 250,
-      rating: 4.8,
-      category: 'Công nghệ',
-    },
-    {
-      id: 2,
-      title: 'Music Festival Vietnam',
-      date: '2025-10-20',
-      location: 'Hà Nội',
-      price: '800,000 VND',
-      image:
-        'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=250&fit=crop',
-      attendees: 500,
-      rating: 4.9,
-      category: 'Âm nhạc',
-    },
-    {
-      id: 3,
-      title: 'Startup Meetup & Networking',
-      date: '2025-08-25',
-      location: 'Đà Nẵng',
-      price: '200,000 VND',
-      image:
-        'https://images.unsplash.com/photo-1511578314322-379afb476865?w=400&h=250&fit=crop',
-      attendees: 100,
-      rating: 4.7,
-      category: 'Kinh doanh',
-    },
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  searchQuery = '';
+  isLoading = signal(false);
+  isBannerLoading = signal(false);
+
+  featuredEvents: Events[] = [];
+  largeCapacityEvents: Events[] = [];
+  bannerEvents = signal<Events[]>([]);
+  currentBannerIndex = 0;
+
+  categories = signal<Category[]>([]);
+  carouselNumVisible = signal<number>(3);
+
+  carouselResponsiveOptions = [
+    { breakpoint: '1199px', numVisible: 3, numScroll: 1 },
+    { breakpoint: '991px', numVisible: 2, numScroll: 1 },
+    { breakpoint: '767px', numVisible: 1, numScroll: 1 },
   ];
 
+  // Mảng features đã được cập nhật, không còn chứa mã SVG
   features: Feature[] = [
     {
-      icon: '<svg fill="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
       title: 'Thanh toán an toàn',
       description:
         'Hệ thống thanh toán được mã hóa với SSL, hỗ trợ đa dạng phương thức thanh toán online.',
     },
     {
-      icon: '<svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/></svg>',
       title: 'Check-in QR Code',
       description:
         'Vé điện tử với mã QR, check-in nhanh chóng và chống giả mạo hiệu quả.',
     },
     {
-      icon: '<svg fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>',
       title: 'Real-time Updates',
       description:
         'Cập nhật thông tin sự kiện, số lượng vé còn lại và thông báo quan trọng theo thời gian thực.',
     },
     {
-      icon: '<svg fill="currentColor" viewBox="0 0 24 24"><path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>',
       title: 'Tìm kiếm thông minh',
       description:
         'Công cụ tìm kiếm AI giúp gợi ý sự kiện phù hợp với sở thích và vị trí của bạn.',
     },
     {
-      icon: '<svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>',
       title: 'Quản lý dễ dàng',
       description:
         'Dashboard trực quan cho ban tổ chức, theo dõi doanh thu và quản lý người tham gia.',
     },
     {
-      icon: '<svg fill="currentColor" viewBox="0 0 24 24"><path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3z"/></svg>',
       title: 'Hỗ trợ 24/7',
       description:
         'Đội ngũ hỗ trợ khách hàng chuyên nghiệp, sẵn sàng giải đáp mọi thắc mắc của bạn.',
     },
   ];
 
-  categories = [
-    {
-      name: 'Âm nhạc',
-      icon: '<svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>',
-      gradient: 'from-pink-500 to-red-500',
-    },
-    {
-      name: 'Công nghệ',
-      icon: '<svg fill="currentColor" viewBox="0 0 24 24"><path d="M20 3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h3l-1 1v2h12v-2l-1-1h3c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 13H4V5h16v11z"/></svg>',
-      gradient: 'from-blue-500 to-cyan-500',
-    },
-    {
-      name: 'Thể thao',
-      icon: '<svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM13 17h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>',
-      gradient: 'from-green-500 to-teal-500',
-    },
-    {
-      name: 'Kinh doanh',
-      icon: '<svg fill="currentColor" viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>',
-      gradient: 'from-purple-500 to-indigo-500',
-    },
-    {
-      name: 'Giáo dục',
-      icon: '<svg fill="currentColor" viewBox="0 0 24 24"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>',
-      gradient: 'from-yellow-500 to-orange-500',
-    },
-    {
-      name: 'Ẩm thực',
-      icon: '<svg fill="currentColor" viewBox="0 0 24 24"><path d="M8.1 13.34l2.83-2.83L3.91 3.5c-1.56 1.56-1.56 4.09 0 5.66l4.19 4.18zm6.78-1.81c1.53.71 3.68.21 5.27-1.38 1.91-1.91 2.28-4.65.81-6.12-1.46-1.46-4.2-1.1-6.12.81-1.59 1.59-2.09 3.74-1.38 5.27L3.7 19.87l1.41 1.41L12 14.41l6.88 6.88 1.41-1.41L13.41 13l1.47-1.47z"/></svg>',
-      gradient: 'from-red-500 to-pink-500',
-    },
-  ];
+  loadFeaturedEvents(): void {
+    this.isLoading.set(true);
+    const params: EventsListParams = {
+      page: 0,
+      size: 3,
+      sortBy: 'startDate',
+      sortDirection: 'ASC'
+    };
+    this.eventService
+      .getEvents(params)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: EventsListResponse) => {
+          this.featuredEvents = response.events || [];
+          this.isLoading.set(false);
+        },
+        error: (error) => {
+          console.error('Error loading featured events:', error);
+          this.isLoading.set(false);
+        },
+      });
+  }
 
+  updateCarouselVisibility(): void {
+    const eventCount = this.largeCapacityEvents.length;
+    // Nếu có sự kiện, lấy số nhỏ hơn giữa số sự kiện và 3.
+    // Nếu không có sự kiện nào, đặt mặc định là 3 để tránh lỗi.
+    this.carouselNumVisible.set(eventCount > 0 ? Math.min(eventCount, 3) : 3);
+    console.log('visble: ', this.carouselNumVisible(), eventCount);
+  }
+
+  loadLargeCapacityEvents(): void {
+    const params: EventsListParams = {
+      page: 0,
+      size: 6,
+    };
+    this.eventService
+      .getEvents(params)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: EventsListResponse) => {
+          this.largeCapacityEvents = response.events || [];
+          this.updateCarouselVisibility();
+        },
+        error: (error) => {
+          console.error('Error loading large capacity events:', error);
+          this.updateCarouselVisibility();
+        },
+      });
+  }
+
+  loadEventCategories(): void {
+    this.createEventService
+      .getEventCategories()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (categories: string[]) => {
+          const mappedCategories = categories.map((category, index) => ({
+            name: category,
+            icon: this.getCategoryIcon(category),
+            gradient: this.getCategoryGradient(index),
+          }));
+          this.categories.set(mappedCategories);
+        },
+        error: (error) => {
+          console.error('Error loading categories:', error);
+        },
+      });
+  }
+
+  loadBannerEvents(): void {
+    this.isBannerLoading.set(true);
+    const params: EventsListParams = {
+      page: 0,
+      size: 5,
+      sortBy: 'startDate',
+      sortDirection: 'ASC',
+    };
+    this.eventService
+      .getEvents(params)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: EventsListResponse) => {
+          const banner =
+            response.events?.filter((event) => event.eventBanner) || [];
+          this.isBannerLoading.set(false);
+          this.bannerEvents.set(banner);
+        },
+        error: (error) => {
+          console.error('Error loading banner events:', error);
+          this.isBannerLoading.set(false);
+        },
+      });
+  }
+
+  startBannerRotation(): void {
+    this.loadBannerEvents();
+    interval(4000)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        if (this.bannerEvents().length > 0) {
+          this.currentBannerIndex =
+            (this.currentBannerIndex + 1) % this.bannerEvents().length;
+        }
+      });
+  }
+
+  onSearch(): void {
+    if (this.searchQuery.trim()) {
+      const queryParams = {
+        search: this.searchQuery,
+      };
+      this.router.navigate(['/events'], { queryParams });
+    }
+  }
+
+  onEnterSearch(event: KeyboardEvent): void {
+    if (event.key === 'Enter') {
+      this.onSearch();
+    }
+  }
+
+  onBookEvent(event: Events): void {
+    console.log('Booking event:', event.id);
+    // alert(`Đặt vé cho sự kiện: ${event.eventName}`);
+    this.router.navigate(['/event-detail/', event.id]);
+  }
+
+  onViewAllEvents(): void {
+    this.router.navigate(['/events']);
+  }
+
+  onCategoryClick(categoryName: string): void {
+    const queryParams = {
+      category: categoryName,
+    };
+    this.router.navigate(['/events'], { queryParams });
+  }
+
+  onBannerClick(event: Events): void {
+    // console.log('Banner event clicked:', event.id);
+    // alert(`Xem chi tiết sự kiện: ${event.eventName}`);
+    this.router.navigate(['/event-detail/', event.id]);
+  }
+
+  nextBanner(): void {
+    if (this.bannerEvents().length > 1) {
+      this.currentBannerIndex =
+        (this.currentBannerIndex + 1) % this.bannerEvents().length;
+        console.log("banner size: ", this.currentBannerIndex, this.bannerEvents().length);
+    }
+  }
+
+  prevBanner(): void {
+    if (this.bannerEvents().length > 0) {
+      this.currentBannerIndex =
+        this.currentBannerIndex === 0
+          ? this.bannerEvents().length - 1
+          : this.currentBannerIndex - 1;
+    }
+  }
+
+  setBannerIndex(index: number): void {
+    this.currentBannerIndex = index;
+  }
 
   formatDate(dateString: string): string {
     const date = new Date(dateString);
@@ -158,5 +303,66 @@ export class HomeComponent implements OnInit{
       month: 'long',
       day: 'numeric',
     });
+  }
+
+  minPriceZone(event: Events): string {
+    const minPrice = Math.min(
+      ...event.zones.filter((zone) => zone.isSellable).map((zone) => zone.price)
+    );
+    if (minPrice == 0) return 'Miễn Phí';
+    return this.formatPrice(minPrice);
+  }
+
+  formatPrice(price: number): string {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+    }).format(price);
+  }
+
+  getImageUrl(imagePath: string): string {
+    if (!imagePath) return '';
+    return this.createEventService.urlImg(imagePath);
+  }
+
+  getTotalSeats(event: Events): number {
+    return (
+      event.zones?.reduce((total, zone) => total + (zone.maxTickets || 0), 0) ||
+      0
+    );
+  }
+
+  // Đã thêm icon cho "Hội thảo"
+  public getCategoryIcon(category: string): string {
+    const iconMap: { [key: string]: string } = {
+      'Âm nhạc': '🎵',
+      'Hội thảo': '🎤',
+      'Công nghệ': '💻',
+      'Thể thao': '⚽',
+      'Kinh doanh': '💼',
+      'Giáo dục': '📚',
+      'Ẩm thực': '🍜',
+      'Nghệ thuật': '🎨',
+      'Du lịch': '✈️',
+      'Sức khỏe': '🏥',
+      Khác: '📅',
+    };
+    return iconMap[category] || '📅';
+  }
+
+  private getCategoryGradient(index: number): string {
+    const gradients = [
+      'from-pink-500 to-red-500',
+      'from-blue-500 to-cyan-500',
+      'from-green-500 to-teal-500',
+      'from-purple-500 to-indigo-500',
+      'from-yellow-500 to-orange-500',
+      'from-red-500 to-pink-500',
+    ];
+    return gradients[index % gradients.length];
+  }
+
+  trackByEventId(index: number, event: Events): string {
+    return event.id;
   }
 }
